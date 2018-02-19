@@ -86,10 +86,17 @@ public class f   {
 }*/
 package edu.buffalo.www.cse4562;
  
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
- 
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
@@ -103,16 +110,64 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  
 public class Main {
 	
-	public static RelTreeObj<RelationalAlgebra> createTree(PlainSelect query) {
-		RelTreeObj<RelationalAlgebra> parent = null;
-		RelTreeObj<RelationalAlgebra> leaf = null;
+	static CreateTable create;
+	
+	private static void ParseTree(RelTreeObj leafnode) throws IOException
+	{
+		
+		Scan table = (Scan)leafnode.getOperator();
+		Tuple tupleobj = new Tuple();
+		RelTreeObj parentnode = null;
+		int printflag = 1;
+				
+		Reader reader = Files.newBufferedReader(Paths.get("src\\"+table.fromitem+".csv"));
+		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|').withIgnoreHeaderCase().withTrim());
+		
+		
+		for (CSVRecord tupple : parser.getRecords()) 
+		{
+			tupleobj.record = tupple;
+			tupleobj.table = create;
+			parentnode = leafnode.retParent();
+			printflag = 1;
+			
+			
+			while(parentnode != null)
+			{
+				
+				if(parentnode.operator.api(tupleobj)==true)
+				{
+				 parentnode = parentnode.retParent();
+				}
+				else
+				{
+					printflag = 0;
+					break;
+				}
+			}
+			
+			if(printflag == 1)
+			{
+				System.out.println("Print the tupple : "+tupleobj.record.toString());
+			}
+			
+			
+			
+		}
+	}
+	
+	
+	
+	public static RelTreeObj createTree(PlainSelect query) {
+		RelTreeObj parent = null;
+		RelTreeObj leaf = null;
 		List<SelectItem> selItem = query.getSelectItems();
 		if(!selItem.isEmpty()) {
 			RelationalAlgebra op = new Projection();
 			Projection op1= (Projection)op;
 			op1.projection = selItem;
 			op= (RelationalAlgebra)op1 ;
-			RelTreeObj<RelationalAlgebra> child = new RelTreeObj<>(op);
+			RelTreeObj child = new RelTreeObj(op);
 			parent = child;
 		}
 		Expression exp = query.getWhere();
@@ -121,8 +176,8 @@ public class Main {
 			Selection op1 = (Selection)op;
 			op1.expression = exp;
 			op = (RelationalAlgebra)op1;
-			RelTreeObj<RelationalAlgebra> child = new RelTreeObj<>(op);
-			parent.addChild(child);
+			RelTreeObj child = new RelTreeObj(op);
+			parent.attachChild(child);
 			parent = child;
 		}
 		FromItem from = query.getFromItem();
@@ -131,8 +186,8 @@ public class Main {
 			Scan op1 = (Scan)op;
 			op1.fromitem = from;
 			op = (RelationalAlgebra)op1;
-			RelTreeObj<RelationalAlgebra> child = new RelTreeObj<>(op);
-			parent.addChild(child);
+			RelTreeObj child = new RelTreeObj(op);
+			parent.attachChild(child);
 			parent = child;
 			leaf = child;
 		}
@@ -142,8 +197,8 @@ public class Main {
 	public static void main(String[] args) throws ParseException {
 		System.out.println("Hello, World");
 		
-		RelTreeObj<RelationalAlgebra> leaf = null;
-		Reader input = new StringReader("SELECT a from abc where 1=2");
+		RelTreeObj leaf = null;
+		Reader input = new StringReader("create table R(c1 integer, c2 integer);SELECT a from (select * from R) where c1=1");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {
@@ -155,19 +210,27 @@ public class Main {
 					PlainSelect plain = (PlainSelect)body;
 					leaf = createTree(plain);
 					
-					System.out.println("Child detail : " + leaf.data.getClass());
+					try 
+					{
+						ParseTree(leaf);
+					} 
+					catch (IOException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
-					leaf.data.api();
 					
-					
-					int k = 0;
 				}
 				int i = 0;
 			}
 			else if(statement instanceof CreateTable) {
-				CreateTable create = (CreateTable)statement;
+				create = (CreateTable)statement;
 				int k = 0;
 			}
+			
+			
+			
  
 			statement = parser.Statement();
 		}
