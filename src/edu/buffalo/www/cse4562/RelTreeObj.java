@@ -3,43 +3,35 @@ package edu.buffalo.www.cse4562;
 import java.util.ArrayList;
 import java.util.List;
  
-public class RelTreeObj<O> {
-	public O data = null;
-	private RelTreeObj<O> parent = null;
-	private List<RelTreeObj<O>> child = new ArrayList<>();
+public class RelTreeObj {
+	
+	private RelTreeObj parent = null;
+	public RelationalAlgebra operator = null;
+	
+	private List<RelTreeObj> child = new ArrayList<>();
  
-	public RelTreeObj(O data) {
-	this.data = data;
+	
+	public RelationalAlgebra getOperator() 
+	{
+		return operator;
+	}
+	
+	public RelTreeObj(RelationalAlgebra operator) 
+	{
+		this.operator = operator;
 	}
  
-	public RelTreeObj<O> addChild(RelTreeObj<O> child) {
-	child.setParent(this);
-	this.child.add(child);
-	return child;
+	public RelTreeObj attachChild(RelTreeObj childop) 
+	{
+		childop.parent=this;
+		this.child.add(childop);
+		return childop;
 	}
  
-	public void addChildren(List<RelTreeObj<O>> children) {
-	children.forEach(each -> each.setParent(this));
-	this.child.addAll(children);
+	public RelTreeObj retParent() 
+	{
+		return parent;
 	}
- 
-	public List<RelTreeObj<O>> getChildren() {
-	return child;
-	}
- 
-	public O getData() {
-	return data;
-	}
- 
-	public void setData(O data) {
-	this.data = data;
-	}
- 
-	private void setParent(RelTreeObj<O> parent) {
-	this.parent = parent;
-	}
- 
-	public RelTreeObj<O> getParent() {
-	return parent;
-	}
+	
+	
 }

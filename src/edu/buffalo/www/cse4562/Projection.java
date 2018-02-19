@@ -19,9 +19,10 @@ public class Projection extends Tuple implements RelationalAlgebra
 {
 	 //ItemsList ll;
 	 public List<SelectItem> projection;
-	 public void api()
+	 public boolean api(Tuple tupleobj)
 	 {
-		  String s1="Jio";
+		  String s1="projecting";
 		  System.out.println(s1);
+		  return true;
 	 }
 }

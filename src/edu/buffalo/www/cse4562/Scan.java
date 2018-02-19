@@ -17,9 +17,10 @@ import net.sf.jsqlparser.parser.*;
 public class Scan  extends Tuple implements RelationalAlgebra 
 {
    public FromItem fromitem;
-   public void api()
+   public boolean api(Tuple tupleobj)
    {
- 	  String s1="Hellsso";
+ 	  String s1="scanning";
  	  System.out.println(s1);
+ 	  return true;
    }
 }
