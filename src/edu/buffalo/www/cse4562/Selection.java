@@ -27,7 +27,14 @@ public class Selection extends Tuple implements RelationalAlgebra
 			  // TODO Auto-generated method stub
 			  String columnName = arg0.getColumnName();
 			  int index = sl.indexOf(columnName);
-			  return tupleobj.tuple.get(index);
+			  if(index >= 0)
+					return tupleobj.tuple.get(index);
+			else
+			{
+				int test = 0;
+				PrimitiveValue val = new LongValue(Long.valueOf(test));
+				return val;
+			}
 			  }
 		  };
 	  PrimitiveValue type = eval.eval(expression);

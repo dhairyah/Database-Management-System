@@ -53,7 +53,14 @@ public class Projection extends Tuple implements RelationalAlgebra
 						String columnName = arg0.getColumnName();
 						//int index = sl.indexOf(columnName);
 						int index = t.columnNames.indexOf(columnName);
-						return t.tuple.get(index);
+						if(index >= 0)
+							return t.tuple.get(index);
+						else
+						{
+							int test = 0;
+							PrimitiveValue val = new LongValue(Long.valueOf(test));
+							return val;
+						}
 					}
 				 };
 				 SelectItem i = projection.get(j);
