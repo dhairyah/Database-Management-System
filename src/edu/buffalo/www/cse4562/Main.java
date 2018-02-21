@@ -255,7 +255,7 @@ public class Main {
 		treebounds[1] = leaf;
 		return treebounds;
 	}
-	public static void main(String[] args) throws ParseException, SQLException {
+	public static void main(String[] args) throws ParseException, SQLException, IOException {
 		//System.out.println("Hello, World");
 		
 		RelTreeObj[] treebounds = new RelTreeObj[2];
@@ -301,6 +301,7 @@ public class Main {
 			}
 			else if(statement instanceof CreateTable) {
 				create = (CreateTable)statement;
+				Reader reader = Files.newBufferedReader(Paths.get("data//"+"R.dat"));
 				int k = 0;
 			}
 			
