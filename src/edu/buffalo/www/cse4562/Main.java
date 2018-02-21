@@ -260,7 +260,7 @@ public class Main {
 		RelTreeObj leaf = null;
 		String prompt = "$> ";
 		
-		int exc = 5/0;
+		//int exc = 5/0;
 		
 		System.out.println(prompt);
         System.out.flush();
