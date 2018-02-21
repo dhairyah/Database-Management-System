@@ -129,7 +129,7 @@ public class Main {
 		RelTreeObj parentnode = null;
 		int printflag = 1;
 				
-		Reader reader = Files.newBufferedReader(Paths.get("src\\"+table.fromitem+".csv"));
+		Reader reader = Files.newBufferedReader(Paths.get("data\\"+table.fromitem+".dat"));
 		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|').withIgnoreHeaderCase().withTrim());
 		
 		
@@ -182,7 +182,6 @@ public class Main {
 			
 			if(printflag == 1)
 			{
-				//System.out.println("Print the tupple : "+tupleobj.record.toString());
 				for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
 				{
 					System.out.print(tupleobj.tuple.get(i) + "|");
@@ -257,7 +256,7 @@ public class Main {
 		
 		RelTreeObj[] treebounds = new RelTreeObj[2];
 		RelTreeObj leaf = null;
-		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT * from (select * from R)");
+		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT aa.* from (select c1,c2 from (select c1,c2 from R) where 1=2) aa where 2=3");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {

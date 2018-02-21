@@ -70,10 +70,11 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 tempTuple.add(type);
 					 int lop = 2;
 				 }
-				 else if(i instanceof AllColumns)
+				 else if(i instanceof AllColumns || i instanceof AllTableColumns)
 				 {
 					 tempTuple.addAll(t.tuple);
 				 }
+				 
 		  }
 		  
 		  t.tuple.clear();
