@@ -253,7 +253,7 @@ public class Main {
 		return treebounds;
 	}
 	public static void main(String[] args) throws ParseException, SQLException {
-		System.out.println("Hello, World");
+		//System.out.println("Hello, World");
 		
 		RelTreeObj[] treebounds = new RelTreeObj[2];
 		RelTreeObj leaf = null;
