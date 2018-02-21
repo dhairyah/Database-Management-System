@@ -87,6 +87,7 @@ public class f   {
 package edu.buffalo.www.cse4562;
  
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
@@ -252,14 +253,25 @@ public class Main {
 		return treebounds;
 	}
 	public static void main(String[] args) throws ParseException, SQLException {
-		System.out.println("Hello, World");
+		//System.out.println("Hello, World");
 		
 		RelTreeObj[] treebounds = new RelTreeObj[2];
 		RelTreeObj leaf = null;
-		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT aa.* from (select c1,c2 from (select c1,c2 from R) where 1=2) aa where 2=3");
+		String prompt = "$> ";
+		
+		System.out.println(prompt);
+        System.out.flush();
+
+        Reader input = new InputStreamReader(System.in);
+
+		//Reader input = new StringReader("create table R(c1 int, c2 int);SELECT c1 from R");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {
+			
+			System.out.println(statement);
+			
+			
 			if(statement instanceof Select) {
 				Select select = (Select) statement;
 				SelectBody body = select.getSelectBody();
@@ -291,6 +303,8 @@ public class Main {
 			
  
 			statement = parser.Statement();
+			System.out.println(prompt);
+            System.out.flush();
 		}
 	}
 }
