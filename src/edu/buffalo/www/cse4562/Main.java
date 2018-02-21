@@ -144,8 +144,6 @@ public class Main {
 			{
 				String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
 				
-				System.out.println("dataType = " + dataType);
-				
 				if(dataType.equals("int"))
 				{
 					String temp = tupple.get(i);
@@ -255,7 +253,7 @@ public class Main {
 		treebounds[1] = leaf;
 		return treebounds;
 	}
-	public static void main(String[] args) throws ParseException, SQLException, IOException {
+	public static void main(String[] args) throws ParseException, SQLException {
 		//System.out.println("Hello, World");
 		
 		RelTreeObj[] treebounds = new RelTreeObj[2];
@@ -301,7 +299,6 @@ public class Main {
 			}
 			else if(statement instanceof CreateTable) {
 				create = (CreateTable)statement;
-				Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
 				int k = 0;
 			}
 			
