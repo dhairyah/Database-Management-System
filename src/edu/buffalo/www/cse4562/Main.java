@@ -144,6 +144,8 @@ public class Main {
 			{
 				String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
 				
+				System.out.println("dataType = " + dataType);
+				
 				if(dataType.equals("int"))
 				{
 					String temp = tupple.get(i);
