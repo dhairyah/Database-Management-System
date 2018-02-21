@@ -26,7 +26,8 @@ public class Selection extends Tuple implements RelationalAlgebra
 		  public PrimitiveValue eval(Column arg0) throws SQLException {
 			  // TODO Auto-generated method stub
 			  String columnName = arg0.getColumnName();
-			  int index = sl.indexOf(columnName);
+			  //int index = sl.indexOf(columnName);
+			  int index = tupleobj.columnNames.indexOf(columnName);
 			  if(index >= 0)
 					return tupleobj.tuple.get(index);
 			else
