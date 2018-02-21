@@ -305,9 +305,10 @@ public class Main {
 			
 			
  
-			statement = parser.Statement();
+			
 			System.out.println(prompt);
-            System.out.flush();
+           		 System.out.flush();
+			statement = parser.Statement();
 		}
 	}
 }
