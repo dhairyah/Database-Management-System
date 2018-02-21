@@ -121,6 +121,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 public class Main {
 	
 	static CreateTable create;
+	int exc = 5/0;
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{
