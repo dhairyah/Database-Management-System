@@ -301,7 +301,7 @@ public class Main {
 			}
 			else if(statement instanceof CreateTable) {
 				create = (CreateTable)statement;
-				Reader reader = Files.newBufferedReader(Paths.get("data//"+"R.dat"));
+				Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
 				int k = 0;
 			}
 			
