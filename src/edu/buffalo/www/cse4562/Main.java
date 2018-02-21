@@ -115,6 +115,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.SubSelect;
  
 public class Main {
 	
@@ -196,9 +197,10 @@ public class Main {
 	
 	
 	
-	public static RelTreeObj createTree(PlainSelect query) {
+	public static RelTreeObj[] createTree(PlainSelect query) {
 		RelTreeObj parent = null;
 		RelTreeObj leaf = null;
+		RelTreeObj[] treebounds = new RelTreeObj[2];
 		List<SelectItem> selItem = query.getSelectItems();
 		if(!selItem.isEmpty()) {
 			RelationalAlgebra op = new Projection();
@@ -206,6 +208,7 @@ public class Main {
 			op1.projection = selItem;
 			op= (RelationalAlgebra)op1 ;
 			RelTreeObj child = new RelTreeObj(op);
+			treebounds[0] = child;
 			parent = child;
 		}
 		Expression exp = query.getWhere();
@@ -222,21 +225,39 @@ public class Main {
 		if(from != null) {
 			RelationalAlgebra op = new Scan();
 			Scan op1 = (Scan)op;
-			op1.fromitem = from;
-			op = (RelationalAlgebra)op1;
-			RelTreeObj child = new RelTreeObj(op);
-			parent.attachChild(child);
-			parent = child;
-			leaf = child;
+			
+			
+			if(from instanceof SubSelect)
+			{
+				
+				RelTreeObj[] subtreebounds = new RelTreeObj[2];
+				subtreebounds = createTree((PlainSelect) ((SubSelect) from).getSelectBody());
+				parent.attachChild(subtreebounds[0]);
+				parent = subtreebounds[0];
+				leaf = subtreebounds[1];
+				
+			}			
+			else
+			{			
+					
+				op1.fromitem = from;
+				op = (RelationalAlgebra)op1;
+				RelTreeObj child = new RelTreeObj(op);
+				parent.attachChild(child);
+				parent = child;
+				leaf = child;
+			}
 		}
 		
-		return leaf;
+		treebounds[1] = leaf;
+		return treebounds;
 	}
 	public static void main(String[] args) throws ParseException, SQLException {
 		System.out.println("Hello, World");
 		
+		RelTreeObj[] treebounds = new RelTreeObj[2];
 		RelTreeObj leaf = null;
-		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT A.c1 from R A");
+		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT * from (select * from R)");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {
@@ -246,11 +267,11 @@ public class Main {
 				if(body instanceof PlainSelect)
 				{
 					PlainSelect plain = (PlainSelect)body;
-					leaf = createTree(plain);
+					treebounds = createTree(plain);
 					
 					try 
 					{
-						ParseTree(leaf);
+						ParseTree(treebounds[1]);
 					} 
 					catch (IOException e) 
 					{
