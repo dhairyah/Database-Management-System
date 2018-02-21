@@ -139,10 +139,13 @@ public class Main {
 		{
 			tupleobj.record = tupple;
 			tupleobj.tuple.clear();
+			tupleobj.columnNames.clear();
 			int numColumns = create.getColumnDefinitions().size();
 			for(int i = 0; i < numColumns; i++)
 			{
 				String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
+				String colName = create.getColumnDefinitions().get(i).getColumnName();
+				tupleobj.columnNames.add(colName);
 				
 				if(dataType.equals("int"))
 				{

@@ -13,9 +13,11 @@ public class Tuple
   public CreateTable table;
   public CSVRecord record;
   public List<PrimitiveValue> tuple;
+  public List<String> columnNames;
   
   Tuple(){
 	  tuple = new ArrayList<PrimitiveValue>();
+	  columnNames = new ArrayList<String>();
   }
 
 }
