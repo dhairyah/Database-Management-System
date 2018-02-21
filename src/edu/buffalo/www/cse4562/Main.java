@@ -91,16 +91,24 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import net.sf.jsqlparser.expression.BooleanValue;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -112,7 +120,7 @@ public class Main {
 	
 	static CreateTable create;
 	
-	private static void ParseTree(RelTreeObj leafnode) throws IOException
+	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{
 		
 		Scan table = (Scan)leafnode.getOperator();
@@ -127,6 +135,31 @@ public class Main {
 		for (CSVRecord tupple : parser.getRecords()) 
 		{
 			tupleobj.record = tupple;
+			tupleobj.tuple.clear();
+			int numColumns = create.getColumnDefinitions().size();
+			for(int i = 0; i < numColumns; i++)
+			{
+				String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
+				
+				if(dataType.equals("int"))
+				{
+					String temp = tupple.get(i);
+					PrimitiveValue d = new LongValue(Long.valueOf(temp));
+					tupleobj.tuple.add(d);
+				}
+				else if(dataType.equals("string"))
+				{
+					String temp = tupple.get(i);
+					PrimitiveValue d = new StringValue(temp);
+					tupleobj.tuple.add(d);
+				}
+				else if(dataType.equals("date"))
+				{
+					String temp = tupple.get(i);
+					PrimitiveValue d = new DateValue(temp);
+					tupleobj.tuple.add(d);
+				}
+			}
 			tupleobj.table = create;
 			parentnode = leafnode.retParent();
 			printflag = 1;
@@ -148,7 +181,12 @@ public class Main {
 			
 			if(printflag == 1)
 			{
-				System.out.println("Print the tupple : "+tupleobj.record.toString());
+				//System.out.println("Print the tupple : "+tupleobj.record.toString());
+				for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+				{
+					System.out.print(tupleobj.tuple.get(i) + "|");
+				}
+				System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 			}
 			
 			
@@ -194,11 +232,11 @@ public class Main {
 		
 		return leaf;
 	}
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws ParseException, SQLException {
 		System.out.println("Hello, World");
 		
 		RelTreeObj leaf = null;
-		Reader input = new StringReader("create table R(c1 integer, c2 integer);SELECT a from R where c1=1");
+		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT A.c1 from R A");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {

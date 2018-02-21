@@ -1,7 +1,9 @@
 package edu.buffalo.www.cse4562;
+import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.statement.*;
 import net.sf.jsqlparser.parser.CCJSqlParser.*;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.statement.select.*;
@@ -19,14 +21,14 @@ public class Projection extends Tuple implements RelationalAlgebra
 {
 	 //ItemsList ll;
 	 public List<SelectItem> projection;
-	 public boolean api(Tuple t)
+	 public boolean api(Tuple t) throws SQLException	
 	 {
-		  String s1="Jio";
-		  System.out.println(projection);
+		  //System.out.println(projection);
 		  int ps= projection.size();
 		  int ts=t.table.getColumnDefinitions().size();
 		  List<String> sl = new ArrayList<String>();
 		  List<Integer> il = new ArrayList<Integer>();
+		  List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 			  for(int j=0;j<ts;j++)
 			  {
 				String tt= t.table.getColumnDefinitions().get(j).getColumnName();
@@ -38,8 +40,45 @@ public class Projection extends Tuple implements RelationalAlgebra
              String tt=projection.get(j).toString();
              il.add(sl.indexOf(tt));
 		  }
-		  System.out.println(sl);
-		  System.out.println(il);
+		  //System.out.println("sl = " + sl);
+		  //System.out.println("il = " + il);
+		  
+		  for (int j = 0; j < ps; j++)
+		  {
+				 Eval eval = new Eval() {
+
+					@Override
+					public PrimitiveValue eval(Column arg0) throws SQLException {
+						// TODO Auto-generated method stub
+						String columnName = arg0.getColumnName();
+						int index = sl.indexOf(columnName);
+						return t.tuple.get(index);
+					}
+				 };
+				 SelectItem i = projection.get(j);
+				 if(i instanceof SelectExpressionItem)
+				 {
+					 SelectExpressionItem k = (SelectExpressionItem)i;
+					 String alias = k.getAlias();
+					 if(alias != null)
+					 {
+						 //need to modify schema;
+						 int test = 0;
+					 }
+					 Expression expr = k.getExpression();
+					 PrimitiveValue type = eval.eval(expr);
+					 tempTuple.add(type);
+					 int lop = 2;
+				 }
+				 else if(i instanceof AllColumns)
+				 {
+					 tempTuple.addAll(t.tuple);
+				 }
+		  }
+		  
+		  t.tuple.clear();
+		  t.tuple.addAll(tempTuple);
+			 
 		  return true;
 	 }
 }
