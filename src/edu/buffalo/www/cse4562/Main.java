@@ -165,6 +165,24 @@ public class Main {
 					PrimitiveValue d = new DateValue(temp);
 					tupleobj.tuple.add(d);
 				}
+				else if(dataType.equals("varchar"))
+				{
+					String temp = tupple.get(i);
+					PrimitiveValue d = new StringValue(temp);
+					tupleobj.tuple.add(d);
+				}
+				else if(dataType.equals("char"))
+				{
+					String temp = tupple.get(i);
+					PrimitiveValue d = new StringValue(temp);
+					tupleobj.tuple.add(d);
+				}
+				else if(dataType.equals("decimal"))
+				{
+					String temp = tupple.get(i);
+					PrimitiveValue d = new DoubleValue(temp);
+					tupleobj.tuple.add(d);
+				}
 			}
 			tupleobj.table = create;
 			parentnode = leafnode.retParent();
