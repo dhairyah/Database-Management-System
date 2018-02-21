@@ -121,7 +121,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 public class Main {
 	
 	static CreateTable create;
-	int exc = 5/0;
+	
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{
@@ -259,6 +259,8 @@ public class Main {
 		RelTreeObj[] treebounds = new RelTreeObj[2];
 		RelTreeObj leaf = null;
 		String prompt = "$> ";
+		
+		int exc = 5/0;
 		
 		System.out.println(prompt);
         System.out.flush();
