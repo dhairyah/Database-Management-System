@@ -257,7 +257,7 @@ public class Main {
 		
 		RelTreeObj[] treebounds = new RelTreeObj[2];
 		RelTreeObj leaf = null;
-		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT * from (select * from R)");
+		Reader input = new StringReader("create table R(c1 int, c2 int);SELECT c1 from R WHERE c1>c2");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {
