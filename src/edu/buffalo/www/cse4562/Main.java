@@ -149,41 +149,45 @@ public class Main {
 					
 				tupleobj.columnNames.add(lowercolname);
 				
-				if(dataType.equals("int"))
+				if(dataType.equalsIgnoreCase("int"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new LongValue(Long.valueOf(temp));
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("string"))
+				else if(dataType.equalsIgnoreCase("string"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("date"))
+				else if(dataType.equalsIgnoreCase("date"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new DateValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("varchar"))
+				else if(dataType.equalsIgnoreCase("varchar"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("char"))
+				else if(dataType.equalsIgnoreCase("char"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("decimal"))
+				else if(dataType.equalsIgnoreCase("decimal"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new DoubleValue(temp);
 					tupleobj.tuple.add(d);
+				}
+				else
+				{
+					int err = 3/0;
 				}
 			}
 			tupleobj.table = create;
@@ -276,7 +280,7 @@ public class Main {
 		treebounds[1] = leaf;
 		return treebounds;
 	}
-	private static void test() throws IOException
+	private static void test() throws IOException, SQLException
 	{
 		Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
 	}
@@ -332,6 +336,7 @@ public class Main {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+
 				}
 				System.exit(0);
 			}
