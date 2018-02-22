@@ -93,6 +93,7 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -120,7 +121,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
  
 public class Main {
 	
-	static CreateTable create;
+	//static CreateTable create;
+	static HashMap<String, CreateTable> map = new HashMap<>();
 	
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
@@ -133,7 +135,7 @@ public class Main {
 				
 		Reader reader = Files.newBufferedReader(Paths.get("data//"+table.fromitem+".dat"));
 		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
-		
+		CreateTable create = map.get(table.fromitem.toString());
 		
 		for (CSVRecord tupple : parser.getRecords()) 
 		{
@@ -329,8 +331,11 @@ public class Main {
 				int i = 0;
 			}
 			else if(statement instanceof CreateTable) {
-				create = (CreateTable)statement;
+				//create = (CreateTable)statement;
+				CreateTable create1 = (CreateTable) statement;
 				int k = 0;
+				String tableName = create1.getTable().getName();
+				map.put(tableName, create1);
 				/*try {
 					test();
 				} catch (IOException e) {
