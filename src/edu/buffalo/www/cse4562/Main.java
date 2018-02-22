@@ -331,14 +331,14 @@ public class Main {
 			else if(statement instanceof CreateTable) {
 				create = (CreateTable)statement;
 				int k = 0;
-				try {
+				/*try {
 					test();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 
 				}
-				System.exit(0);
+				System.exit(0);*/
 			}
 			
 			
