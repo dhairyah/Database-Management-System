@@ -276,7 +276,7 @@ public class Main {
 		treebounds[1] = leaf;
 		return treebounds;
 	}
-	private static void test() throws IOException
+	private static void test() throws IOException, SQLException
 	{
 		Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
 	}
