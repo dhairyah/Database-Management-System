@@ -132,7 +132,7 @@ public class Main {
 		int printflag = 1;
 				
 		Reader reader = Files.newBufferedReader(Paths.get("data//"+table.fromitem+".dat"));
-		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|').withIgnoreHeaderCase().withTrim());
+		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 		
 		
 		for (CSVRecord tupple : parser.getRecords()) 
