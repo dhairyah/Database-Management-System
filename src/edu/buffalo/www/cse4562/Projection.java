@@ -12,6 +12,8 @@ import net.sf.jsqlparser.statement.select.SelectBody.*;
 import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.create.table.*;
 import java.lang.Object;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
@@ -55,14 +57,21 @@ public class Projection extends Tuple implements RelationalAlgebra
 						String lowercolname = columnName.toLowerCase();
 						//int index = sl.indexOf(columnName);
 						int index = t.columnNames.indexOf(lowercolname);
-						//if(index >= 0)
+						if(index >= 0)
 							return t.tuple.get(index);
-						/*else
+						else
 						{
+							System.out.println(lowercolname);
+							try {
+								Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							int test = 0;
 							PrimitiveValue val = new LongValue(Long.valueOf(test));
 							return val;
-						}*/
+						}
 					}
 				 };
 				 SelectItem i = projection.get(j);
