@@ -149,37 +149,37 @@ public class Main {
 					
 				tupleobj.columnNames.add(lowercolname);
 				
-				if(dataType.equals("int"))
+				if(dataType.equalsIgnoreCase("int"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new LongValue(Long.valueOf(temp));
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("string"))
+				else if(dataType.equalsIgnoreCase("string"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("date"))
+				else if(dataType.equalsIgnoreCase("date"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new DateValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("varchar"))
+				else if(dataType.equalsIgnoreCase("varchar"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("char"))
+				else if(dataType.equalsIgnoreCase("char"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
-				else if(dataType.equals("decimal"))
+				else if(dataType.equalsIgnoreCase("decimal"))
 				{
 					String temp = tupple.get(i);
 					PrimitiveValue d = new DoubleValue(temp);
