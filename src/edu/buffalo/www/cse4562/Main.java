@@ -276,6 +276,10 @@ public class Main {
 		treebounds[1] = leaf;
 		return treebounds;
 	}
+	private static void test() throws IOException
+	{
+		Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
+	}
 	public static void main(String[] args) throws ParseException, SQLException {
 		//System.out.println("Hello, World");
 		
@@ -323,6 +327,12 @@ public class Main {
 			else if(statement instanceof CreateTable) {
 				create = (CreateTable)statement;
 				int k = 0;
+				try {
+					test();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			
