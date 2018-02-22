@@ -187,7 +187,7 @@ public class Main {
 				}
 				else
 				{
-					int i = 3/0;
+					int err = 3/0;
 				}
 			}
 			tupleobj.table = create;
