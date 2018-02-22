@@ -32,9 +32,10 @@ public class Selection extends Tuple implements RelationalAlgebra
 					return tupleobj.tuple.get(index);
 			else
 			{
-				int test = 0;
+				/*int test = 0;
 				PrimitiveValue val = new LongValue(Long.valueOf(test));
-				return val;
+				return val;*/
+				return tupleobj.tuple.get(0);
 			}
 			  }
 		  };
