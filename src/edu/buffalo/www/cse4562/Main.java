@@ -131,7 +131,7 @@ public class Main {
 		RelTreeObj parentnode = null;
 		int printflag = 1;
 				
-		Reader reader = Files.newBufferedReader(Paths.get("data//"+table.fromitem+".dat"));
+		Reader reader = Files.newBufferedReader(Paths.get("src//"+table.fromitem+".csv"));
 		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|').withIgnoreHeaderCase().withTrim());
 		
 		

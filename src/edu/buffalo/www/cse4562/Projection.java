@@ -82,7 +82,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 }
 					 else
 					 {
-						 tempColumnNames.add(expr.toString());
+						 tempColumnNames.add(expr.toString().toLowerCase());
 					 }
 					 int lop = 2;
 				 }
