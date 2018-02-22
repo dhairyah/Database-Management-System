@@ -185,6 +185,10 @@ public class Main {
 					PrimitiveValue d = new DoubleValue(temp);
 					tupleobj.tuple.add(d);
 				}
+				else
+				{
+					int i = 3/0;
+				}
 			}
 			tupleobj.table = create;
 			parentnode = leafnode.retParent();
