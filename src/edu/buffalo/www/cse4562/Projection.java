@@ -52,8 +52,9 @@ public class Projection extends Tuple implements RelationalAlgebra
 					public PrimitiveValue eval(Column arg0) throws SQLException {
 						// TODO Auto-generated method stub
 						String columnName = arg0.getColumnName();
+						String lowercolname = columnName.toLowerCase();
 						//int index = sl.indexOf(columnName);
-						int index = t.columnNames.indexOf(columnName);
+						int index = t.columnNames.indexOf(lowercolname);
 						//if(index >= 0)
 							return t.tuple.get(index);
 						/*else
@@ -77,7 +78,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 {
 						 //need to modify schema;
 						 //int test = 0;
-						 tempColumnNames.add(alias);
+						 tempColumnNames.add(alias.toLowerCase());
 					 }
 					 else
 					 {

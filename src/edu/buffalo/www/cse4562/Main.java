@@ -145,7 +145,9 @@ public class Main {
 			{
 				String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
 				String colName = create.getColumnDefinitions().get(i).getColumnName();
-				tupleobj.columnNames.add(colName);
+				String lowercolname = colName.toLowerCase();
+					
+				tupleobj.columnNames.add(lowercolname);
 				
 				if(dataType.equals("int"))
 				{
