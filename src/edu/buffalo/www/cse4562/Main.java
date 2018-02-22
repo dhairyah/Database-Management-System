@@ -131,7 +131,7 @@ public class Main {
 		RelTreeObj parentnode = null;
 		int printflag = 1;
 				
-		Reader reader = Files.newBufferedReader(Paths.get("data//"+table.fromitem+".dat"));
+		Reader reader = Files.newBufferedReader(Paths.get("src//"+table.fromitem+".csv"));
 		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 		
 		
@@ -298,12 +298,12 @@ public class Main {
 
         Reader input = new InputStreamReader(System.in);
 
-		//Reader input = new StringReader("CREATE TABLE players (playerid int , lastname string , firstname string , weight int , startyear int );SELECT P.playerid FROM (SELECT playerid, lastname, firstname, weight as w FROM players WHERE startyear <= 1991) P WHERE P.w < 192;");
+		
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {
 			
-			System.out.println(statement);
+			//System.out.println(statement);
 			
 			
 			if(statement instanceof Select) {
