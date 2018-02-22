@@ -76,7 +76,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 if(alias != null)
 					 {
 						 //need to modify schema;
-						 int test = 0;
+						 //int test = 0;
 						 tempColumnNames.add(alias);
 					 }
 					 else
