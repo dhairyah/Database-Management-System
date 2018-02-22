@@ -28,14 +28,14 @@ public class Selection extends Tuple implements RelationalAlgebra
 			  String columnName = arg0.getColumnName();
 			  //int index = sl.indexOf(columnName);
 			  int index = tupleobj.columnNames.indexOf(columnName);
-			  if(index >= 0)
+			  //if(index >= 0)
 					return tupleobj.tuple.get(index);
-			else
+			/*else
 			{
 				int test = 0;
 				PrimitiveValue val = new LongValue(Long.valueOf(test));
 				return val;
-			}
+			}*/
 			  }
 		  };
 	  PrimitiveValue type = eval.eval(expression);

@@ -29,6 +29,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 		  List<String> sl = new ArrayList<String>();
 		  List<Integer> il = new ArrayList<Integer>();
 		  List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
+		  List<String> tempColumnNames = new ArrayList<String>();
 			  for(int j=0;j<ts;j++)
 			  {
 				String tt= t.table.getColumnDefinitions().get(j).getColumnName();
@@ -53,14 +54,14 @@ public class Projection extends Tuple implements RelationalAlgebra
 						String columnName = arg0.getColumnName();
 						//int index = sl.indexOf(columnName);
 						int index = t.columnNames.indexOf(columnName);
-						if(index >= 0)
+						//if(index >= 0)
 							return t.tuple.get(index);
-						else
+						/*else
 						{
 							int test = 0;
 							PrimitiveValue val = new LongValue(Long.valueOf(test));
 							return val;
-						}
+						}*/
 					}
 				 };
 				 SelectItem i = projection.get(j);
@@ -68,14 +69,20 @@ public class Projection extends Tuple implements RelationalAlgebra
 				 {
 					 SelectExpressionItem k = (SelectExpressionItem)i;
 					 String alias = k.getAlias();
+					 
+					 Expression expr = k.getExpression();
+					 PrimitiveValue type = eval.eval(expr);
+					 tempTuple.add(type);
 					 if(alias != null)
 					 {
 						 //need to modify schema;
 						 int test = 0;
+						 tempColumnNames.add(alias);
 					 }
-					 Expression expr = k.getExpression();
-					 PrimitiveValue type = eval.eval(expr);
-					 tempTuple.add(type);
+					 else
+					 {
+						 tempColumnNames.add(expr.toString());
+					 }
 					 int lop = 2;
 				 }
 				 else if(i instanceof AllColumns || i instanceof AllTableColumns)
@@ -87,6 +94,8 @@ public class Projection extends Tuple implements RelationalAlgebra
 		  
 		  t.tuple.clear();
 		  t.tuple.addAll(tempTuple);
+		  t.columnNames.clear();
+		  t.columnNames.addAll(tempColumnNames);
 			 
 		  return true;
 	 }

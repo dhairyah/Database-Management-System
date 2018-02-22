@@ -288,7 +288,7 @@ public class Main {
 
         Reader input = new InputStreamReader(System.in);
 
-		//Reader input = new StringReader("create table R(c1 int, c2 int);SELECT c1 from R");
+		//Reader input = new StringReader("CREATE TABLE players (playerid int , lastname string , firstname string , weight int , startyear int );SELECT P.playerid FROM (SELECT playerid, lastname, firstname, weight as w FROM players WHERE startyear <= 1991) P WHERE P.w < 192;");
 		CCJSqlParser parser = new CCJSqlParser(input);
 		Statement statement = parser.Statement();
 		while(statement != null) {
