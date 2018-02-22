@@ -64,7 +64,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 							int test = 0;
 							PrimitiveValue val = new LongValue(Long.valueOf(test));
 							//return val;
-							return t.tuple.get(index);
+							return t.tuple.get(0);
 						}
 					}
 				 };
