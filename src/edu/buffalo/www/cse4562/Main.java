@@ -157,7 +157,7 @@ public class Main {
 				}
 				else if(dataType.equalsIgnoreCase("string"))
 				{
-					String temp = tupple.get(lowercolname);
+					String temp = tupple.get(0);
 					PrimitiveValue d = new StringValue(temp);
 					tupleobj.tuple.add(d);
 				}
