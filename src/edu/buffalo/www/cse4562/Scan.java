@@ -40,9 +40,11 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   tupplelist = parser.iterator(); 
    }
    
-   public void reset()
+   public void reset() throws IOException
    {
-	   tupplelist = parser.iterator();
+	   reader = Files.newBufferedReader(Paths.get("src//"+fromitem+".csv"));
+	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
+	   tupplelist = parser.iterator(); 
    }
    
    boolean hasNext()

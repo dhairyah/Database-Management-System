@@ -250,6 +250,14 @@ public class Main {
 				node1.fromitem = from;
 				node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
 				
+				try {
+					node1.open();
+					node2.open();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				op1.node1 = node1;
 				op1.node2 = node2;
 				op = (RelationalAlgebra)op1;

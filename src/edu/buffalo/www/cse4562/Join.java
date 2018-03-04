@@ -19,15 +19,7 @@ public class Join implements RelationalAlgebra{
  
 			Scan scan1 = (Scan)node1;
 			Scan scan2  = (Scan)node2;
-			
-			
-			try {
-				scan2.open();
-				scan1.open();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			Tuple rightTuple = new Tuple();
 			
 			while ((current_left_tuple != null) || scan1.hasNext())
 			{
@@ -38,7 +30,7 @@ public class Join implements RelationalAlgebra{
  
 				while(scan2.hasNext())
 				{
-					Tuple rightTuple = scan2.retNext();
+					rightTuple = scan2.retNext();
 					tupleobj.tuple.clear();
 					tupleobj.columnNames.clear();
 					tupleobj.tuple.addAll(current_left_tuple.tuple);
@@ -48,7 +40,12 @@ public class Join implements RelationalAlgebra{
 					return true;
 				}
 				current_left_tuple = null;
-				scan2.reset();
+				try {
+					scan2.reset();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		return false;
