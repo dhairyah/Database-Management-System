@@ -14,10 +14,10 @@ public class Selection extends Tuple implements RelationalAlgebra
 	  //String s1="selection";
 	  //System.out.println(s1);
 	  List<String> sl = new ArrayList<String>();
-	  int ts=tupleobj.table.getColumnDefinitions().size();
+	  int ts=tupleobj.columnNames.size();
 	  for(int j=0;j<ts;j++)
 	  {
-		String tt= tupleobj.table.getColumnDefinitions().get(j).getColumnName();
+		String tt= tupleobj.columnNames.get(j);
 		sl.add(tt);
 	  }
 	  
@@ -29,7 +29,7 @@ public class Selection extends Tuple implements RelationalAlgebra
 			  String lowercolname = columnName.toLowerCase();
 			  //int index = sl.indexOf(columnName);
 			  int index = tupleobj.columnNames.indexOf(lowercolname);
-			  return tupleobj.tuple.get(index);
+			return tupleobj.tuple.get(index);
 			}
 		  };
 	  PrimitiveValue type = eval.eval(expression);

@@ -25,16 +25,20 @@ public class Projection extends Tuple implements RelationalAlgebra
 	 {
 		  //System.out.println(projection);
 		  int ps= projection.size();
+
 		  int ts=t.table.getColumnDefinitions().size();
 		  Tuple X ;
 		  X=t;
+
+
+
 		  List<String> sl = new ArrayList<String>();
 		  List<Integer> il = new ArrayList<Integer>();
 		  List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 		  List<String> tempColumnNames = new ArrayList<String>();
 			  for(int j=0;j<ts;j++)
 			  {
-				String tt= t.table.getColumnDefinitions().get(j).getColumnName();
+				String tt= t.columnNames.get(j);
 				sl.add(tt);
 			  }
 		  //System.out.println(sl);

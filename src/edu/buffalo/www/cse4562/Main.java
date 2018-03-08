@@ -125,157 +125,114 @@ public class Main {
 	
 	//static CreateTable create;
 	static HashMap<String, CreateTable> map = new HashMap<>();
-	static int l=-1;
-	static int c=0;
+	
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
-	{
-		
-		Scan table = (Scan)leafnode.getOperator();
-		Tuple tupleobj = new Tuple();
-		RelTreeObj parentnode = null;
-		//ArrayList<PrimitiveValue> pp= new ArrayList<PrimitiveValue>();
-		ArrayList<ArrayList<PrimitiveValue>> ta = new ArrayList<ArrayList<PrimitiveValue>>();
-		int tai=0;
-		int printflag = 1;
-				
-		Reader reader = Files.newBufferedReader(Paths.get("D://Eclipse//DB//CSE4562SP18//src//"+table.fromitem+".csv"));
-		CSVParser parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
-		CreateTable create = map.get(table.fromitem.toString());
-		
-		for (CSVRecord tupple : parser.getRecords()) 
+	{		
+		Tuple tupleobj;
+		RelTreeObj parentnode;
+		if(leafnode.getOperator() instanceof Scan)
 		{
+			Scan table = (Scan)leafnode.getOperator();
+			table.open();
+			tupleobj = new Tuple();
+			parentnode = null;
+			int tai=0;
+			int printflag = 1;
 			
-			//System.out.println("l:"+l);
-			if(c==l)
+			while(table.hasNext())
 			{
+				tupleobj = table.retNext();
+	
+				parentnode = leafnode.retParent();
+				printflag = 1;
 				
-				//System.out.println("vvv");
-				break;
-			}
-			tupleobj.record = tupple;
-			tupleobj.tuple.clear();
-			tupleobj.columnNames.clear();
-			int numColumns = create.getColumnDefinitions().size();
-			for(int i = 0; i < numColumns; i++)
-			{
-				String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
-				String colName = create.getColumnDefinitions().get(i).getColumnName();
-				String lowercolname = colName.toLowerCase();
+				
+				while(parentnode != null)
+				{
 					
-				tupleobj.columnNames.add(lowercolname);
-				//System.out.println("TTTtupple:"+tupleobj.columnNames);
+					if(parentnode.operator.api(tupleobj)==true)
+					{
+						if (parentnode.operator instanceof OrderBy)
+						 {
+							/// System.out.println("fgf"+tupleobj.columnNames);
+							 
+							 //OrderBy ob=new OrderBy();
+							 ((OrderBy)parentnode.operator).otable.add(new ArrayList<PrimitiveValue>());
+							 for(int i = 0; i < tupleobj.tuple.size(); i++)
+								{
+									//System.out.print(tupleobj.tuple.get(i) + "|");
+								 ((OrderBy)parentnode.operator).otable.get(tai).add(tupleobj.tuple.get(i));  
+									//ta.get(tai).add(tupleobj.tuple.get(i));
+								}
+								//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+							    // 	ta.get(tai).add(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+						 }	
+					 parentnode = parentnode.retParent();
+					}
+					else
+					{
+						printflag = 0;
+						break;
+					}
+				}
 				
-				if(dataType.equalsIgnoreCase("int"))
+				if(printflag == 1)
 				{
-					String temp = tupple.get(i);
-					PrimitiveValue d = new LongValue(Long.valueOf(temp));
-					tupleobj.tuple.add(d);
+					for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+					{
+						System.out.print(tupleobj.tuple.get(i) + "|");
+					}
+					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				}
-				else if(dataType.equalsIgnoreCase("string"))
-				{
-					String temp = tupple.get(i);
-					PrimitiveValue d = new StringValue(temp);
-					tupleobj.tuple.add(d);
-				}
-				else if(dataType.equalsIgnoreCase("date"))
-				{
-					String temp = tupple.get(i);
-					PrimitiveValue d = new DateValue(temp);
-					tupleobj.tuple.add(d);
-				}
-				else if(dataType.equalsIgnoreCase("varchar"))
-				{
-					String temp = tupple.get(i);
-					PrimitiveValue d = new StringValue(temp);
-					tupleobj.tuple.add(d);
-				}
-				else if(dataType.equalsIgnoreCase("char"))
-				{
-					String temp = tupple.get(i);
-					PrimitiveValue d = new StringValue(temp);
-					tupleobj.tuple.add(d);
-				}
-				else if(dataType.equalsIgnoreCase("decimal"))
-				{
-					String temp = tupple.get(i);
-					PrimitiveValue d = new DoubleValue(temp);
-					tupleobj.tuple.add(d);
-				}
-				else
-				{
-					//int err = 3/0;
-				}
+				
+				
+			 tai++;
 			}
-			// System.out.println("fgf"+tupleobj.columnNames);
-			tupleobj.table = create;
-			parentnode = leafnode.retParent();
-			printflag = 1;
-			
-			
-			while(parentnode != null)
-			{
-				 //System.out.println("Class"+parentnode.operator.getClass());
-				 //System.out.println("fgf"+tupleobj.columnNames);
-				if(parentnode.operator.api(tupleobj)==true)
-				{
-				 if (parentnode.operator instanceof OrderBy)
-				 {
-					/// System.out.println("fgf"+tupleobj.columnNames);
-					 
-					 //OrderBy ob=new OrderBy();
-					 ((OrderBy)parentnode.operator).otable.add(new ArrayList<PrimitiveValue>());
-					 for(int i = 0; i < tupleobj.tuple.size(); i++)
-						{
-							//System.out.print(tupleobj.tuple.get(i) + "|");
-						 ((OrderBy)parentnode.operator).otable.get(tai).add(tupleobj.tuple.get(i));  
-							//ta.get(tai).add(tupleobj.tuple.get(i));
-						}
-						//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-					    // 	ta.get(tai).add(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-				 }
-				 parentnode = parentnode.retParent();
-				}
-				else
-				{
-					printflag = 0;
-					break;
-				}
-			}
-			
-			if(printflag == 1)
-			{
-				ta.add(new ArrayList<PrimitiveValue>());
-				for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
-				{
-					//System.out.print(tupleobj.tuple.get(i) + "|");
-					ta.get(tai).add(tupleobj.tuple.get(i));
-				}
-				//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-			     	ta.get(tai).add(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-			}
-			
-			c++;
-			tai++;
 		}
-		
-		//OrderBy orderobject =new OrderBy();
+		else
+		{
+			Join join = (Join)leafnode.getOperator();
+			tupleobj = new Tuple();
+			parentnode = null;
+			int printflag = 1;
+			
+			while(join.api(tupleobj))
+			{
+				parentnode = leafnode.retParent();
+				printflag = 1;
+				
+				
+				while(parentnode != null)
+				{
+					
+					if(parentnode.operator.api(tupleobj)==true)
+					{
+					 	
+					 parentnode = parentnode.retParent();
+					}
+					else
+					{
+						printflag = 0;
+						break;
+					}
+				}
+				
+				if(printflag == 1)
+				{
+					for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+					{
+						System.out.print(tupleobj.tuple.get(i) + "|");
+					}
+					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+				}
+				
+			}
+		}
 		parentnode = leafnode.retParent();
 		parentnode = parentnode.retParent();
-		//System.out.println("inparse:"+parentnode.operator.getClass());
-		/*while(!(parentnode.operator instanceof OrderBy))
-		{  System.out.println(parentnode.operator.getClass());
-			parentnode = leafnode.retParent();}	*/
-		//System.out.println("FinalColumns:"+tupleobj.columnNames);
-		System.out.println("Finalo:"+((OrderBy)parentnode.operator).otable);
-		/*for (int i=0;i<((OrderBy)parentnode.operator).otable.size();i++)
-		{
-			//System.out.print(((OrderBy)parentnode.operator).otable.get(i).get(0));
-			System.out.print("XXXXXX:"+((OrderBy)parentnode.operator).otable);
-		}*/
-		//((OrderBy)parentnode.operator).SortColumn();
+		System.out.println("Original:"+((OrderBy)parentnode.operator).otable);
 		((OrderBy)parentnode.operator).fun(tupleobj);
-		//System.out.println("Final::"+ta.get(0).get(0).toDouble());
 	}
 	
 	
@@ -320,31 +277,63 @@ public class Main {
 		}
 		FromItem from = query.getFromItem();
 		if(from != null) {
-			RelationalAlgebra op = new Scan();
-			Scan op1 = (Scan)op;
 			
-			
-			if(from instanceof SubSelect)
+			if(query.getJoins()!=null)
 			{
+				RelationalAlgebra op = new Join();
+				Join op1 = (Join)op;
 				
-				RelTreeObj[] subtreebounds = new RelTreeObj[2];
-				subtreebounds = createTree((PlainSelect) ((SubSelect) from).getSelectBody());
-				parent.attachChild(subtreebounds[0]);
-				parent = subtreebounds[0];
-				leaf = subtreebounds[1];
+				Scan node1 = new Scan();
+				Scan node2 = new Scan();
+				node1.fromitem = from;
+				node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
 				
-			}			
-			else
-			{			
-					
-				op1.fromitem = from;
+				try {
+					node1.open();
+					node2.open();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				op1.node1 = node1;
+				op1.node2 = node2;
 				op = (RelationalAlgebra)op1;
 				RelTreeObj child = new RelTreeObj(op);
 				parent.attachChild(child);
 				parent = child;
 				leaf = child;
+				
+			}
+			else
+			{
+				RelationalAlgebra op = new Scan();
+				Scan op1 = (Scan)op;
+				
+				
+				if(from instanceof SubSelect)
+				{
+					
+					RelTreeObj[] subtreebounds = new RelTreeObj[2];
+					subtreebounds = createTree((PlainSelect) ((SubSelect) from).getSelectBody());
+					parent.attachChild(subtreebounds[0]);
+					parent = subtreebounds[0];
+					leaf = subtreebounds[1];
+					
+				}			
+				else
+				{			
+						
+					op1.fromitem = from;
+					op = (RelationalAlgebra)op1;
+					RelTreeObj child = new RelTreeObj(op);
+					parent.attachChild(child);
+					parent = child;
+					leaf = child;
+				}
 			}
 		}
+		
 		treebounds[1] = leaf;
 		return treebounds;
 	}
@@ -380,25 +369,11 @@ public class Main {
 				if(body instanceof PlainSelect)
 				{
 					PlainSelect plain = (PlainSelect)body;
-				//	List<OrderByElement> cc= plain.getOrderByElements(); 
-				//	System.out.println("coll:"+cc);	
-					if (plain.getLimit()!=null)
-					{	l=(int)plain.getLimit().getRowCount(); }
-					//System.out.println("dff:"+plain.getLimit().getRowCount());
 					treebounds = createTree(plain);
 					
 					try 
-					{   
-						//RelTreeObj aa=treebounds[1]; 
-						//System.out.println("Parent:"+treebounds[0].operator.getClass());
-						/*for (int i=0;i<3;i++)
-						{
-							System.out.println("Thats id:"+aa.operator.getClass());
-						    aa=aa.retParent();
-						}*/
-						//System.out.println("Thats id:"+treebounds[1].operator.getClass());
+					{
 						ParseTree(treebounds[1]);
-						
 					} 
 					catch (IOException e) 
 					{

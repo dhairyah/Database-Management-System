@@ -21,11 +21,11 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 public class OrderBy extends Tuple implements RelationalAlgebra//,Comparator<Tuple>
 {
 	ArrayList<ArrayList<PrimitiveValue>> otable = new ArrayList<ArrayList<PrimitiveValue>>();
-	ArrayList<ArrayList<PrimitiveValue>> otable1 = new ArrayList<ArrayList<PrimitiveValue>>();
-	ArrayList<Double> tll=new ArrayList<Double>();
-	boolean[] b;
+	//ArrayList<ArrayList<PrimitiveValue>> otable1 = new ArrayList<ArrayList<PrimitiveValue>>();
+	//ArrayList<Double> tll=new ArrayList<Double>();
+	//boolean[] b;
 	
-	int tai;
+	//int tai;
 	int nn;
 	List<OrderByElement> element; 
 	Tuple ne;
@@ -82,7 +82,7 @@ public class OrderBy extends Tuple implements RelationalAlgebra//,Comparator<Tup
 		} 
 		 System.out.println("ot1:"+otable1);*/
 		 Collections.sort(otable, new compare(nn));
-		 System.out.println("fdfdf:"+otable);
+		 System.out.println("AfterSort:"+otable);
 	}
 		
 
