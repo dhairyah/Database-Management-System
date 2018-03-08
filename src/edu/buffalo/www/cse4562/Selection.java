@@ -29,7 +29,7 @@ public class Selection extends Tuple implements RelationalAlgebra
 			  String lowercolname = columnName.toLowerCase();
 			  //int index = sl.indexOf(columnName);
 			  int index = tupleobj.columnNames.indexOf(lowercolname);
-			return tupleobj.tuple.get(index);
+			  return tupleobj.tuple.get(index);
 			}
 		  };
 	  PrimitiveValue type = eval.eval(expression);
