@@ -93,7 +93,6 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -129,16 +128,16 @@ public class Main {
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{		
-		Tuple tupleobj;
-		RelTreeObj parentnode;
+		
 		if(leafnode.getOperator() instanceof Scan)
 		{
 			Scan table = (Scan)leafnode.getOperator();
 			table.open();
-			tupleobj = new Tuple();
-			parentnode = null;
-			int tai=0;
+			Tuple tupleobj = new Tuple();
+			RelTreeObj parentnode = null;
+			OrderBy orderby = new OrderBy();
 			int printflag = 1;
+			int blockOperator = 0;
 			
 			while(table.hasNext())
 			{
@@ -153,22 +152,14 @@ public class Main {
 					
 					if(parentnode.operator.api(tupleobj)==true)
 					{
-						if (parentnode.operator instanceof OrderBy)
-						 {
-							/// System.out.println("fgf"+tupleobj.columnNames);
-							 
-							 //OrderBy ob=new OrderBy();
-							 ((OrderBy)parentnode.operator).otable.add(new ArrayList<PrimitiveValue>());
-							 for(int i = 0; i < tupleobj.tuple.size(); i++)
-								{
-									//System.out.print(tupleobj.tuple.get(i) + "|");
-								 ((OrderBy)parentnode.operator).otable.get(tai).add(tupleobj.tuple.get(i));  
-									//ta.get(tai).add(tupleobj.tuple.get(i));
-								}
-								//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-							    // 	ta.get(tai).add(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-						 }	
+				     
+					 if(parentnode.getOperator() instanceof OrderBy)
+					 {
+						 blockOperator = 1;
+						 orderby = (OrderBy)parentnode.getOperator();
+					 }
 					 parentnode = parentnode.retParent();
+					 
 					}
 					else
 					{
@@ -177,7 +168,7 @@ public class Main {
 					}
 				}
 				
-				if(printflag == 1)
+				if(printflag == 1 && blockOperator == 0)
 				{
 					for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
 					{
@@ -187,15 +178,22 @@ public class Main {
 				}
 				
 				
-			 tai++;
+				
+			}
+			
+			if(blockOperator==1)
+			{
+				orderby.sortAndPrint();
 			}
 		}
 		else
 		{
 			Join join = (Join)leafnode.getOperator();
-			tupleobj = new Tuple();
-			parentnode = null;
+			Tuple tupleobj = new Tuple();
+			RelTreeObj parentnode = null;
 			int printflag = 1;
+			OrderBy orderby = new OrderBy();
+			int blockOperator = 0;
 			
 			while(join.api(tupleobj))
 			{
@@ -208,8 +206,12 @@ public class Main {
 					
 					if(parentnode.operator.api(tupleobj)==true)
 					{
-					 	
-					 parentnode = parentnode.retParent();
+						if(parentnode.getOperator() instanceof OrderBy)
+						 {
+							 blockOperator = 1;
+							 orderby = (OrderBy)parentnode.getOperator();
+						 }
+						 parentnode = parentnode.retParent();
 					}
 					else
 					{
@@ -218,7 +220,7 @@ public class Main {
 					}
 				}
 				
-				if(printflag == 1)
+				if(printflag == 1 && blockOperator == 0)
 				{
 					for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
 					{
@@ -228,11 +230,12 @@ public class Main {
 				}
 				
 			}
+			
+			if(blockOperator==1)
+			{
+				orderby.sortAndPrint();
+			}
 		}
-		parentnode = leafnode.retParent();
-		parentnode = parentnode.retParent();
-		System.out.println("Original:"+((OrderBy)parentnode.operator).otable);
-		((OrderBy)parentnode.operator).fun(tupleobj);
 	}
 	
 	
@@ -241,19 +244,20 @@ public class Main {
 		RelTreeObj parent = null;
 		RelTreeObj leaf = null;
 		RelTreeObj[] treebounds = new RelTreeObj[2];
-		List<OrderByElement> cc= query.getOrderByElements(); 
-		//if(cc!=null)
-		{
+		int rootCreated = 0;
+		
+		List<OrderByElement> orderbyEl = query.getOrderByElements();
+		if(orderbyEl != null) {
 			RelationalAlgebra op = new OrderBy();
 			OrderBy op1= (OrderBy)op;
-			op1.element=cc;
-			op = (RelationalAlgebra)op1;
+			op1.element = orderbyEl;
+			op= (RelationalAlgebra)op1 ;
 			RelTreeObj child = new RelTreeObj(op);
 			treebounds[0] = child;
-			//parent.attachChild(child);
+			rootCreated = 1;
 			parent = child;
-			//leaf = child;
 		}
+		
 		List<SelectItem> selItem = query.getSelectItems();
 		if(!selItem.isEmpty()) {
 			RelationalAlgebra op = new Projection();
@@ -261,8 +265,14 @@ public class Main {
 			op1.projection = selItem;
 			op= (RelationalAlgebra)op1 ;
 			RelTreeObj child = new RelTreeObj(op);
-			parent.attachChild(child);
-			//treebounds[0] = child;
+			if(rootCreated == 0)
+			{
+				treebounds[0] = child;
+			}
+			else
+			{
+				parent.attachChild(child);
+			}
 			parent = child;
 		}
 		Expression exp = query.getWhere();
@@ -396,6 +406,7 @@ public class Main {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+
 				}
 				System.exit(0);*/
 			}

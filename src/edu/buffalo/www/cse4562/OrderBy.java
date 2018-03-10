@@ -18,74 +18,43 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.PrimitiveType;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
-public class OrderBy extends Tuple implements RelationalAlgebra//,Comparator<Tuple>
+public class OrderBy extends Tuple implements RelationalAlgebra
 {
 	ArrayList<ArrayList<PrimitiveValue>> otable = new ArrayList<ArrayList<PrimitiveValue>>();
-	//ArrayList<ArrayList<PrimitiveValue>> otable1 = new ArrayList<ArrayList<PrimitiveValue>>();
-	//ArrayList<Double> tll=new ArrayList<Double>();
-	//boolean[] b;
-	
-	//int tai;
-	int nn;
+
+	int orderByIndex, tai =0;
 	List<OrderByElement> element; 
 	Tuple ne;
 	@Override
 	public boolean api(Tuple tupleobj) throws SQLException {
-		// TODO Auto-generated method stub
-		//otable.
-//		System.out.println("Inorder:"+element);
-		if(element!=null)
+
+		
+		otable.add(new ArrayList<PrimitiveValue>());
+		orderByIndex=tupleobj.columnNames.indexOf(((Column) element.get(0).getExpression()).getWholeColumnName().toString().toLowerCase()); //code fatega when tname.cname match nai karega
+		for(int i = 0; i < tupleobj.tuple.size(); i++)
 		{
-			ne=tupleobj;
-			nn=tupleobj.columnNames.indexOf(element.get(0).toString());
-			System.out.println("n:"+nn);
-			//System.out.println("ColumnNames:"+tupleobj.table.getColumnDefinitions().get(0).getColumnName());
-			//System.out.println("Element:"+element);
-			//System.out.println("Idnex:"+tupleobj.columnNames.indexOf(element.get(0).toString()));
-		}	
+			 otable.get(tai).add(tupleobj.tuple.get(i));  
+			 
+		}
+		tai++;
+			
 		return true;
 	}
-	public void fun(Tuple tupleobj) throws InvalidPrimitive
+	public void sortAndPrint() throws InvalidPrimitive
 	{
-	/*	b= new boolean[otable.size()];
-		int nn=tupleobj.columnNames.indexOf(element.get(0).toString());
-		System.out.println("n:"+nn);
-		System.out.println("Eke:"+element);
-		System.out.println("Col:"+tupleobj.columnNames);
-		for (int i=0;i<otable.size();i++)
-		{
-			  tll.add(otable.get(i).get(nn).toDouble());
-		}
-		System.out.println("tll:"+tll);
-		List<Double> tll1=new ArrayList<Double>(tll);
-		//tll1.add(63.0);
-		Collections.sort(tll1);
-		System.out.println("tll1:"+tll1);
-		for(int i=0;i<tll.size();i++)
-		{	
-			 System.out.println("i:"+i);
-		 System.out.println("Ind:"+tll.indexOf(tll1.get(i)));
-		//otable1.add(new ArrayList<PrimitiveValue>());
-		 int ind=tll.indexOf(tll1.get(i));
-		 while(b[ind]==true)
+
+		 Collections.sort(otable, new CompareOverride(orderByIndex,element.get(0).isAsc()));
+		 
+		 for(int i=0;i<otable.size();i++)
 		 {
-		     //ind = tll.indexOf(tll1.get(i));
-		     System.out.println("whilind:"+ind);
-		     List<Double> sub= tll.subList(ind+1, tll.size());
-             int second = sub.indexOf((tll1.get(i)));
-             second=second+(tll.size()-sub.size());
-             System.out.println("sec:"+second);
-			 ind=second;
+			 for(int j = 0; j < otable.get(i).size() - 1; j++)
+			 {
+				System.out.print(otable.get(i).get(j) + "|");
+			 }
+			 System.out.println(otable.get(i).get(otable.get(i).size() - 1));
 		 }
-		 b[ind]=true;
-		 otable1.add(otable.get(ind));
-		} 
-		 System.out.println("ot1:"+otable1);*/
-		 Collections.sort(otable, new compare(nn));
-		 System.out.println("AfterSort:"+otable);
 	}
 		
 
  	 
 }
-	

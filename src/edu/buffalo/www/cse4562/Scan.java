@@ -25,8 +25,8 @@ public class Scan  extends Tuple implements RelationalAlgebra
 {
    
    public FromItem fromitem;
-   public String tablename;
    Reader reader=null;
+   public String tablename;
    CSVParser parser=null;
    CreateTable create=null;
    Tuple tupleobj = null;
@@ -34,6 +34,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    
    public void open() throws IOException
    {
+	   
 	   tablename = ((Table) fromitem).getName();
 	   reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
@@ -57,7 +58,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    public boolean api(Tuple tupleobj)
    {
  	  String s1="scanning";
- 	  System.out.println(s1);
+ 	 // System.out.println(s1);
  	  return true;
    }
    
