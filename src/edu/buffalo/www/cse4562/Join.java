@@ -40,11 +40,11 @@ public class Join implements RelationalAlgebra{
 					rightTuple = scan2.retNext();
 				//	System.out.println("aaglu ret ayu : "+ rightTuple.record.toString());
 					tupleobj.tuple.clear();
-					tupleobj.columnNames.clear();
+					tupleobj.colNames.clear();
 					tupleobj.tuple.addAll(current_left_tuple.tuple);
-					tupleobj.columnNames.addAll(current_left_tuple.columnNames);
+					tupleobj.colNames.addAll(current_left_tuple.colNames);
 					tupleobj.tuple.addAll(rightTuple.tuple);
-					tupleobj.columnNames.addAll(rightTuple.columnNames);
+					tupleobj.colNames.addAll(rightTuple.colNames);
 					return true;
 				}
 				current_left_tuple = null;

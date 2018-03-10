@@ -2,6 +2,7 @@ package edu.buffalo.www.cse4562;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.statement.*;
 import net.sf.jsqlparser.parser.CCJSqlParser.*;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.select.*;
@@ -71,7 +72,8 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		CSVRecord tupple = tupplelist.next();
 		tupleobj.record = tupple;
 		tupleobj.tuple.clear();
-		tupleobj.columnNames.clear();
+		//tupleobj.columnNames.clear();
+		tupleobj.colNames.clear();
 		int numColumns = create.getColumnDefinitions().size();
 		for(int i = 0; i < numColumns; i++)
 		{
@@ -79,7 +81,9 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			String colName = create.getColumnDefinitions().get(i).getColumnName();
 			String lowercolname = colName.toLowerCase();
 				
-			tupleobj.columnNames.add(lowercolname);
+			//tupleobj.columnNames.add(lowercolname);
+			Column tempCol = new Column(create.getTable(), colName);
+			tupleobj.colNames.add(tempCol);
 			
 			if(dataType.equalsIgnoreCase("int"))
 			{

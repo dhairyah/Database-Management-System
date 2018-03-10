@@ -30,7 +30,7 @@ public class OrderBy extends Tuple implements RelationalAlgebra
 
 		
 		otable.add(new ArrayList<PrimitiveValue>());
-		orderByIndex=tupleobj.columnNames.indexOf(((Column) element.get(0).getExpression()).getWholeColumnName().toString().toLowerCase()); //code fatega when tname.cname match nai karega
+		//orderByIndex=tupleobj.columnNames.indexOf(((Column) element.get(0).getExpression()).getWholeColumnName().toString().toLowerCase()); //code fatega when tname.cname match nai karega
 		for(int i = 0; i < tupleobj.tuple.size(); i++)
 		{
 			 otable.get(tai).add(tupleobj.tuple.get(i));  

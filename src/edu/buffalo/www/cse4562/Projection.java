@@ -25,16 +25,18 @@ public class Projection extends Tuple implements RelationalAlgebra
 	 {
 		  //System.out.println(projection);
 		  int ps= projection.size();
-		  int ts=t.columnNames.size();
+		  //int ts=t.columnNames.size();
+		  int ts = t.colNames.size();
 		  Tuple X;
 		  X = t;
 		  List<String> sl = new ArrayList<String>();
 		  List<Integer> il = new ArrayList<Integer>();
 		  List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
-		  List<String> tempColumnNames = new ArrayList<String>();
+		  List<Column> tempColumnNames = new ArrayList<Column>();
 			  for(int j=0;j<ts;j++)
 			  {
-				String tt= t.columnNames.get(j);
+				//String tt= t.columnNames.get(j);
+				String tt = t.colNames.get(j).getColumnName();
 				sl.add(tt);
 			  }
 		  //System.out.println(sl);
@@ -53,21 +55,14 @@ public class Projection extends Tuple implements RelationalAlgebra
 					@Override
 					public PrimitiveValue eval(Column arg0) throws SQLException {
 						// TODO Auto-generated method stub
-						String columnName = arg0.getColumnName();
-						String lowercolname = columnName.toLowerCase();
+						//String columnName = arg0.getColumnName();
+						//String lowercolname = columnName.toLowerCase();
 						//int index = sl.indexOf(columnName);
-						int index = t.columnNames.indexOf(lowercolname);
-						//if(index >= 0)
-						{
-							return t.tuple.get(index);
-						}
-						/*else
-						{
-							int test = 0;
-							PrimitiveValue val = new LongValue(Long.valueOf(test));
-							//return val;
-							return t.tuple.get(0);
-						}*/
+						//int index = t.columnNames.indexOf(lowercolname);
+						int index = t.colNames.indexOf(arg0);
+						
+						return t.tuple.get(index);
+						
 					}
 				 };
 				 SelectItem i = projection.get(j);
@@ -83,26 +78,42 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 {
 						 //need to modify schema;
 						 //int test = 0;
-						 tempColumnNames.add(alias.toLowerCase());
+						 tempColumnNames.add((Column)expr);
 					 }
 					 else
 					 {
-						 tempColumnNames.add(expr.toString().toLowerCase());
+						 tempColumnNames.add((Column)expr);
 					 }
 					 int lop = 2;
 				 }
-				 else if(i instanceof AllColumns || i instanceof AllTableColumns)
+				 else if(i instanceof AllColumns )
 				 {
 					 tempTuple.addAll(t.tuple);
-					 tempColumnNames.addAll(X.columnNames);
+					 tempColumnNames.addAll(X.colNames);
+				 }
+				 else if (i instanceof AllTableColumns)
+				 {
+					 AllTableColumns tab = (AllTableColumns) i;
+					 Table tab_name = tab.getTable();
+					 int numCols = t.colNames.size();
+					 for(int ind = 0; ind < numCols; ind++)
+					 {
+						 if(t.colNames.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName()))
+						 {
+							 PrimitiveValue type = eval.eval(t.colNames.get(ind));
+							 tempTuple.add(type);
+							 tempColumnNames.add(t.colNames.get(ind));
+						 }
+					 }
+					 
 				 }
 				 
 		  }
 		  
 		  t.tuple.clear();
 		  t.tuple.addAll(tempTuple);
-		  t.columnNames.clear();
-		  t.columnNames.addAll(tempColumnNames);
+		  t.colNames.clear();
+		  t.colNames.addAll(tempColumnNames);
 			 
 		  return true;
 	 }
