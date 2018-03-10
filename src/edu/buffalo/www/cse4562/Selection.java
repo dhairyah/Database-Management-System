@@ -55,16 +55,15 @@ public class Selection extends Tuple implements RelationalAlgebra
 		  
 		    @Override
 		    public PrimitiveValue eval(InExpression arg0) throws SQLException {
-		    	
-		    	int index = tupleobj.colNames.indexOf(arg0.getLeftExpression());
-				PrimitiveValue leftexp=  tupleobj.tuple.get(index);
+				
+				PrimitiveValue leftExpVal= eval(arg0.getLeftExpression());
 
 				if(arg0.getItemsList() instanceof ItemsList)
 				{	
 
 			    	ExpressionList itemvalues = (ExpressionList) arg0.getItemsList();
 			    	
-			    	if(itemvalues.getExpressions().contains((Expression)leftexp))
+			    	if(itemvalues.getExpressions().contains((Expression)leftExpVal))
 			    	{
 			    		return BooleanValue.TRUE;
 			    	}
