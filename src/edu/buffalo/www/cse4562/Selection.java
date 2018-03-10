@@ -5,7 +5,12 @@ import java.util.List;
 
 import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SubSelect;
 public class Selection extends Tuple implements RelationalAlgebra 
 {
   public Expression expression;	
@@ -47,6 +52,43 @@ public class Selection extends Tuple implements RelationalAlgebra
 				}
 			return tupleobj.tuple.get(index);
 			}
+		  
+		    @Override
+		    public PrimitiveValue eval(InExpression arg0) throws SQLException {
+		    	
+		    	int index = tupleobj.colNames.indexOf(arg0.getLeftExpression());
+				PrimitiveValue leftexp=  tupleobj.tuple.get(index);
+
+				if(arg0.getItemsList() instanceof ItemsList)
+				{	
+
+			    	ExpressionList itemvalues = (ExpressionList) arg0.getItemsList();
+			    	
+			    	if(itemvalues.getExpressions().contains((Expression)leftexp))
+			    	{
+			    		return BooleanValue.TRUE;
+			    	}
+			    	else
+			    	{
+			    		return BooleanValue.FALSE;
+			    	}
+			    	
+				}
+				else if(arg0.getItemsList() instanceof SubSelect)
+				{
+					//not implemented
+					return BooleanValue.TRUE;
+				}
+				else
+				{
+					return BooleanValue.TRUE;
+				}
+				
+			}
+		  
+		  
+		  
+		  
 		  };
 	  PrimitiveValue type = eval.eval(expression);
 	  return type.toBool();
