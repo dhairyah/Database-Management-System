@@ -60,7 +60,20 @@ public class Projection extends Tuple implements RelationalAlgebra
 						//int index = sl.indexOf(columnName);
 						//int index = t.columnNames.indexOf(lowercolname);
 						int index = t.colNames.indexOf(arg0);
-						
+						//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
+						if(index == -1)
+						{
+							int size = t.colNames.size();
+							for(int it = 0; it < size; it++)
+							{
+								if((arg0.getTable().getName().equalsIgnoreCase(t.colNames.get(it).getTable().getAlias())) && 
+								   (arg0.getColumnName().equalsIgnoreCase(t.colNames.get(it).getColumnName())))
+								{
+									index = it;
+									break;
+								}
+							}
+						}
 						return t.tuple.get(index);
 						
 					}
@@ -98,7 +111,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 int numCols = t.colNames.size();
 					 for(int ind = 0; ind < numCols; ind++)
 					 {
-						 if(t.colNames.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName()))
+						 if((t.colNames.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (t.colNames.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
 						 {
 							 PrimitiveValue type = eval.eval(t.colNames.get(ind));
 							 tempTuple.add(type);

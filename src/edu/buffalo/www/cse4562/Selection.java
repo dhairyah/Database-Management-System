@@ -32,6 +32,19 @@ public class Selection extends Tuple implements RelationalAlgebra
 			  //int index = sl.indexOf(columnName);
 			  //int index = tupleobj.columnNames.indexOf(lowercolname);
 			  int index = tupleobj.colNames.indexOf(arg0);
+			  if(index == -1)
+				{
+					int size = tupleobj.colNames.size();
+					for(int it = 0; it < size; it++)
+					{
+						if((arg0.getTable().getName().equalsIgnoreCase(tupleobj.colNames.get(it).getTable().getAlias())) && 
+						   (arg0.getColumnName().equalsIgnoreCase(tupleobj.colNames.get(it).getColumnName())))
+						{
+							index = it;
+							break;
+						}
+					}
+				}
 			return tupleobj.tuple.get(index);
 			}
 		  };

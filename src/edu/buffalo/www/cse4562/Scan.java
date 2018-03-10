@@ -40,6 +40,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   create = Main.map.get(tablename);
+	   create.getTable().setAlias(fromitem.getAlias());
 	   tupleobj = new Tuple();
 	   tupplelist = parser.iterator(); 
    }

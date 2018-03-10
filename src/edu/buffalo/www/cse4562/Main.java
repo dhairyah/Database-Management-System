@@ -240,7 +240,7 @@ public class Main {
 	
 	
 	
-	public static RelTreeObj[] createTree(PlainSelect query) {
+	public static RelTreeObj[] createTree(PlainSelect query, String alias) {
 		RelTreeObj parent = null;
 		RelTreeObj leaf = null;
 		RelTreeObj[] treebounds = new RelTreeObj[2];
@@ -297,6 +297,12 @@ public class Main {
 				Scan node2 = new Scan();
 				node1.fromitem = from;
 				node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
+				if(!alias.isEmpty())
+				{
+					//Added to handle alias in subquery select rr.* from (select * from R) rr;
+					node1.fromitem.setAlias(alias);
+					node2.fromitem.setAlias(alias);
+				}
 				
 				try {
 					node1.open();
@@ -325,7 +331,7 @@ public class Main {
 				{
 					
 					RelTreeObj[] subtreebounds = new RelTreeObj[2];
-					subtreebounds = createTree((PlainSelect) ((SubSelect) from).getSelectBody());
+					subtreebounds = createTree((PlainSelect) ((SubSelect) from).getSelectBody(), ((SubSelect) from).getAlias());
 					parent.attachChild(subtreebounds[0]);
 					parent = subtreebounds[0];
 					leaf = subtreebounds[1];
@@ -335,6 +341,11 @@ public class Main {
 				{			
 						
 					op1.fromitem = from;
+					if(!alias.isEmpty())
+					{
+						//Added to handle alias in subquery select rr.* from (select * from R) rr;
+						op1.fromitem.setAlias(alias);
+					}
 					op = (RelationalAlgebra)op1;
 					RelTreeObj child = new RelTreeObj(op);
 					parent.attachChild(child);
@@ -379,7 +390,7 @@ public class Main {
 				if(body instanceof PlainSelect)
 				{
 					PlainSelect plain = (PlainSelect)body;
-					treebounds = createTree(plain);
+					treebounds = createTree(plain,"");
 					
 					try 
 					{
