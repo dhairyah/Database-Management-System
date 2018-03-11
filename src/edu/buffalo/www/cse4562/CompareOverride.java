@@ -41,17 +41,11 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 			int result = temp_v1.compareTo(temp_v2);
 			if(isAsc)
 			{
-				if(result > 0)
-					return 1;
-				else
-					return -1;
+				return result;
 			}
 			else
 			{
-				if(result > 0)
-					return -1;
-				else
-					return 1;
+				return result*(-1);
 			}
 		}
 		Eval eval = new Eval() {
