@@ -55,7 +55,7 @@ public class OrderBy extends Tuple implements RelationalAlgebra
 				System.out.print(otable.get(i).get(j) + "|");
 			 }
 			 System.out.println(otable.get(i).get(otable.get(i).size() - 1));
-			 c++;
+			  c++;
 		 }
 	}
 		
