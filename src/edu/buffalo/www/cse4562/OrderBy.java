@@ -42,18 +42,20 @@ public class OrderBy extends Tuple implements RelationalAlgebra
 			
 		return true;
 	}
-	public void sortAndPrint() throws InvalidPrimitive
+	public void sortAndPrint(int ll) throws InvalidPrimitive
 	{
-
+                 int c=0;
 		 Collections.sort(otable, new CompareOverride(orderByIndex,element.get(0).isAsc()));
 		 
 		 for(int i=0;i<otable.size();i++)
 		 {
+		         if(c==ll) {break;}
 			 for(int j = 0; j < otable.get(i).size() - 1; j++)
 			 {
 				System.out.print(otable.get(i).get(j) + "|");
 			 }
 			 System.out.println(otable.get(i).get(otable.get(i).size() - 1));
+			 c++;
 		 }
 	}
 		
