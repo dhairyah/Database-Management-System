@@ -86,7 +86,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			Column tempCol = new Column(create.getTable(), colName);
 			tupleobj.colNames.add(tempCol);
 			
-			if(dataType.equalsIgnoreCase("int"))
+			if(dataType.equalsIgnoreCase("integer"))
 			{
 				String temp = tupple.get(i);
 				PrimitiveValue d = new LongValue(Long.valueOf(temp));
