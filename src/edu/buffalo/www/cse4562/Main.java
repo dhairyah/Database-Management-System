@@ -124,7 +124,9 @@ public class Main {
 	
 	//static CreateTable create;
 	static HashMap<String, CreateTable> map = new HashMap<>();
-	
+        static int l=-1;
+	static int c=0;
+	static int f=0;
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{		
@@ -141,6 +143,10 @@ public class Main {
 			
 			while(table.hasNext())
 			{
+				if(c==l && f==0)
+				{
+					break;
+				}
 				tupleobj = table.retNext();
 	
 				parentnode = leafnode.retParent();
@@ -156,6 +162,7 @@ public class Main {
 					 if(parentnode.getOperator() instanceof OrderBy)
 					 {
 						 blockOperator = 1;
+						 f=1;
 						 orderby = (OrderBy)parentnode.getOperator();
 					 }
 					 parentnode = parentnode.retParent();
@@ -177,13 +184,13 @@ public class Main {
 					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				}
 				
-				
+				c++;
 				
 			}
 			
 			if(blockOperator==1)
 			{
-				orderby.sortAndPrint();
+				orderby.sortAndPrint(l);
 			}
 		}
 		else
@@ -199,7 +206,10 @@ public class Main {
 			{
 				parentnode = leafnode.retParent();
 				printflag = 1;
-				
+				if(c==l && f==0)
+				{
+					break;
+				}
 				
 				while(parentnode != null)
 				{
@@ -209,6 +219,7 @@ public class Main {
 						if(parentnode.getOperator() instanceof OrderBy)
 						 {
 							 blockOperator = 1;
+							 f=1;
 							 orderby = (OrderBy)parentnode.getOperator();
 						 }
 						 parentnode = parentnode.retParent();
@@ -228,12 +239,12 @@ public class Main {
 					}
 					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				}
-				
+			c++;	
 			}
 			
 			if(blockOperator==1)
 			{
-				orderby.sortAndPrint();
+				orderby.sortAndPrint(l);
 			}
 		}
 	}
@@ -395,6 +406,8 @@ public class Main {
 				if(body instanceof PlainSelect)
 				{
 					PlainSelect plain = (PlainSelect)body;
+					if (plain.getLimit()!=null)
+					{	l=(int)plain.getLimit().getRowCount(); }
 					treebounds = createTree(plain,"");
 					
 					try 
