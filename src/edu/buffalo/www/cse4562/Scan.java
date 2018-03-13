@@ -47,7 +47,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    
    public void reset() throws IOException
    {
-	   reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
+	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   tupplelist = parser.iterator(); 
    }
@@ -116,7 +116,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 				PrimitiveValue d = new StringValue(temp);
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("decimal"))
+			else if(dataType.equalsIgnoreCase("double"))
 			{
 				String temp = tupple.get(i);
 				PrimitiveValue d = new DoubleValue(temp);
