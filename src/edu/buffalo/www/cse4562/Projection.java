@@ -21,6 +21,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 {
 	 //ItemsList ll;
 	 public List<SelectItem> projection;
+	 public String subQuery_alias;
 	 public boolean api(Tuple t) throws SQLException	
 	 {
 		  //System.out.println(projection);
@@ -86,12 +87,17 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 
 					 Expression expr = k.getExpression();
 					 PrimitiveValue type = eval.eval(expr);
+
 					 tempTuple.add(type);
 					 if(alias != null)
 					 {
 						 //need to modify schema;
 						 //int test = 0;
-						 tempColumnNames.add((Column)expr);
+						 Column col = new Column();
+						 col.setColumnName(alias);
+						 Table tab_temp = new Table();
+						 col.setTable(tab_temp);
+						 tempColumnNames.add((Column)col);
 					 }
 					 else
 					 {
@@ -121,6 +127,15 @@ public class Projection extends Tuple implements RelationalAlgebra
 					 
 				 }
 				 
+		  }
+		  
+		  if(!subQuery_alias.isEmpty())
+		  {
+			  int size = tempColumnNames.size();
+			  for(int i = 0; i < size; i++)
+			  {
+				  tempColumnNames.get(i).getTable().setAlias(subQuery_alias);
+			  }
 		  }
 		  
 		  t.tuple.clear();

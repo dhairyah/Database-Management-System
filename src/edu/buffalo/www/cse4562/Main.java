@@ -251,6 +251,7 @@ public class Main {
 			RelationalAlgebra op = new OrderBy();
 			OrderBy op1= (OrderBy)op;
 			op1.element = orderbyEl;
+			op1.subQuery_alias = alias;
 			op= (RelationalAlgebra)op1 ;
 			RelTreeObj child = new RelTreeObj(op);
 			treebounds[0] = child;
@@ -263,6 +264,10 @@ public class Main {
 			RelationalAlgebra op = new Projection();
 			Projection op1= (Projection)op;
 			op1.projection = selItem;
+			if(rootCreated == 0)
+			{
+				op1.subQuery_alias = alias;
+			}
 			op= (RelationalAlgebra)op1 ;
 			RelTreeObj child = new RelTreeObj(op);
 			if(rootCreated == 0)
@@ -341,11 +346,11 @@ public class Main {
 				{			
 						
 					op1.fromitem = from;
-					if(!alias.isEmpty())
+					/*if(alias != null && !alias.isEmpty())
 					{
 						//Added to handle alias in subquery select rr.* from (select * from R) rr;
-						op1.fromitem.setAlias(alias);
-					}
+						//op1.fromitem.setAlias(alias);
+					}*/
 					op = (RelationalAlgebra)op1;
 					RelTreeObj child = new RelTreeObj(op);
 					parent.attachChild(child);

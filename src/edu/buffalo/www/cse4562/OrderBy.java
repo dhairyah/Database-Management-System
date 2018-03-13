@@ -25,6 +25,7 @@ public class OrderBy extends Tuple implements RelationalAlgebra
 	int orderByIndex, tai =0;
 	List<OrderByElement> element; 
 	Tuple ne;
+	public String subQuery_alias;
 	@Override
 	public boolean api(Tuple tupleobj) throws SQLException {
 

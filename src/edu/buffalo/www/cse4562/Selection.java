@@ -14,6 +14,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 public class Selection extends Tuple implements RelationalAlgebra 
 {
   public Expression expression;	
+
   public boolean api(Tuple tupleobj) throws SQLException
   {
 	  //String s1="selection";
