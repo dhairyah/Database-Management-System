@@ -21,7 +21,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 {
 	 //ItemsList ll;
 	 public List<SelectItem> projection;
-	 public String subQuery_alias;
+	 public String subQuery_alias="";
 	 public boolean api(Tuple t) throws SQLException	
 	 {
 		  //System.out.println(projection);
