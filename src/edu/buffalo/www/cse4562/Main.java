@@ -313,10 +313,11 @@ public class Main {
 		}
 		FromItem from = query.getFromItem();
 		if(from != null) {
-			
+			//System.out.println("xx:"+query.getJoins());
 			if(query.getJoins()!=null)
 			{
-				if(query.getJoins().size()==1)
+				int nux=query.getJoins().size();
+				/*if(query.getJoins().size()==1)
 				{
 					RelationalAlgebra op = new Join();
 					Join op1 = (Join)op;
@@ -347,40 +348,46 @@ public class Main {
 					parent.attachChild(child);
 					parent = child;
 					leaf = child;
-				}
-				else
+				}*/
+				//else
 				{
-					RelationalAlgebra opp = new Join();
-					Join op11 = (Join)opp;
+					while(nux>1)
+					{	
+					 RelationalAlgebra opp = new Join();
+					 Join op11 = (Join)opp;
 					
-					Join node11 = new Join();
-					Scan node22 = new Scan();
-					node11 = op11;
-					node22.fromitem = (FromItem) query.getJoins().get(1).getRightItem();
-					if(!alias.isEmpty())
-					{
+					 Join node11 = new Join();
+					 Scan node22 = new Scan();
+					 node11 = op11;
+					 node22.fromitem = (FromItem) query.getJoins().get(nux-1).getRightItem();
+					 System.out.println("xxmain:"+node22.fromitem);
+					 if(!alias.isEmpty())
+					 {
 						//Added to handle alias in subquery select rr.* from (select * from R) rr;
 						//node1.fromitem.setAlias(alias);
 						node22.fromitem.setAlias(alias);
-					}
+					 } 
 					
-					try {
+					 try {
 			//			node1.open();
 						node22.open();
-					} catch (IOException e) {
+					   } catch (IOException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+						 e.printStackTrace();
+					   }
 					
-					op11.node1 = node11;
-					op11.node2 = node22;
-					opp = (RelationalAlgebra)op11;
-					RelTreeObj childd = new RelTreeObj(opp);
-					parent.attachChild(childd);
-					parent = childd;
-					leaf = childd;
+					  op11.node1 = node11;
+					  op11.node2 = node22;
 					
+			
+  					  opp = (RelationalAlgebra)op11;
+					  RelTreeObj childd = new RelTreeObj(opp);
+					  parent.attachChild(childd);
+					  parent = childd;
+					  leaf = childd;
 					
+					  nux--;
+					}  
 					///////////////////////////////
 					
 					RelationalAlgebra op = new Join();
@@ -488,6 +495,7 @@ public class Main {
 					PlainSelect plain = (PlainSelect)body;
 					if (plain.getLimit()!=null)
 					{	l=(int)plain.getLimit().getRowCount(); }
+					
 					treebounds = createTree(plain,"");
 					
 					try 
@@ -525,7 +533,7 @@ public class Main {
  
 			
 			System.out.println(prompt);
-           		 System.out.flush();
+            System.out.flush();
 			statement = parser.Statement();
 		}
 	}

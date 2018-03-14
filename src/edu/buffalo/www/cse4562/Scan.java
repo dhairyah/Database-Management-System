@@ -37,17 +37,17 @@ public class Scan  extends Tuple implements RelationalAlgebra
    {
 	   
 	   tablename = ((Table) fromitem).getName();
-	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+	   reader = Files.newBufferedReader(Paths.get("D://Eclipse//dbb//CSE4562SP18//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   create = Main.map.get(tablename);
-	   create.getTable().setAlias(fromitem.getAlias());
+	   //create.getTable().setAlias(string);(fromitem.getAlias());
 	   tupleobj = new Tuple();
 	   tupplelist = parser.iterator(); 
    }
    
    public void reset() throws IOException
    {
-	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+	   reader = Files.newBufferedReader(Paths.get("D://Eclipse//dbb//CSE4562SP18//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   tupplelist = parser.iterator(); 
    }
@@ -81,13 +81,14 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
 			String colName = create.getColumnDefinitions().get(i).getColumnName();
 			String lowercolname = colName.toLowerCase();
-				
+				//System.out.println("l:"+dataType);
 			//tupleobj.columnNames.add(lowercolname);
 			Column tempCol = new Column(create.getTable(), colName);
 			tupleobj.colNames.add(tempCol);
 			
-			if(dataType.equalsIgnoreCase("integer"))
+			if(dataType.equalsIgnoreCase("int"))
 			{
+				//System.out.println("fdffd555");
 				String temp = tupple.get(i);
 				PrimitiveValue d = new LongValue(Long.valueOf(temp));
 				tupleobj.tuple.add(d);
@@ -124,7 +125,9 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			}
 			else
 			{
-				int err = 3/0;
+				//System.out.println("dffddf");
+				//int err = 3/0;
+				
 			}
 		
 		tupleobj.table = create;
