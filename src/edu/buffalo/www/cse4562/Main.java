@@ -210,6 +210,17 @@ public class Main {
 					break;
 				}
 				
+				//added join 3 table join
+				if(parentnode.getOperator() instanceof Join)
+				{
+					Join innode  = (Join)parentnode.getOperator();
+					innode.current_left_tuple = tupleobj;
+				//	System.out.println("rg0+"+tupleobj);
+					parentnode.operator = (RelationalAlgebra)innode;
+					ParseTree(parentnode);
+					continue;
+				}
+				
 				while(parentnode != null)
 				{
 					
@@ -305,35 +316,105 @@ public class Main {
 			
 			if(query.getJoins()!=null)
 			{
-				RelationalAlgebra op = new Join();
-				Join op1 = (Join)op;
-				
-				Scan node1 = new Scan();
-				Scan node2 = new Scan();
-				node1.fromitem = from;
-				node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
-				if(!alias.isEmpty())
+				if(query.getJoins().size()==1)
 				{
-					//Added to handle alias in subquery select rr.* from (select * from R) rr;
-					node1.fromitem.setAlias(alias);
-					node2.fromitem.setAlias(alias);
+					RelationalAlgebra op = new Join();
+					Join op1 = (Join)op;
+					
+					Scan node1 = new Scan();
+					Scan node2 = new Scan();
+					node1.fromitem = from;
+					node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
+					if(!alias.isEmpty())
+					{
+						//Added to handle alias in subquery select rr.* from (select * from R) rr;
+						node1.fromitem.setAlias(alias);
+						node2.fromitem.setAlias(alias);
+					}
+					
+					try {
+						node1.open();
+						node2.open();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					op1.node1 = node1;
+					op1.node2 = node2;
+					op = (RelationalAlgebra)op1;
+					RelTreeObj child = new RelTreeObj(op);
+					parent.attachChild(child);
+					parent = child;
+					leaf = child;
 				}
-				
-				try {
-					node1.open();
-					node2.open();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				else
+				{
+					RelationalAlgebra opp = new Join();
+					Join op11 = (Join)opp;
+					
+					Join node11 = new Join();
+					Scan node22 = new Scan();
+					node11 = op11;
+					node22.fromitem = (FromItem) query.getJoins().get(1).getRightItem();
+					if(!alias.isEmpty())
+					{
+						//Added to handle alias in subquery select rr.* from (select * from R) rr;
+						//node1.fromitem.setAlias(alias);
+						node22.fromitem.setAlias(alias);
+					}
+					
+					try {
+			//			node1.open();
+						node22.open();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					op11.node1 = node11;
+					op11.node2 = node22;
+					opp = (RelationalAlgebra)op11;
+					RelTreeObj childd = new RelTreeObj(opp);
+					parent.attachChild(childd);
+					parent = childd;
+					leaf = childd;
+					
+					
+					///////////////////////////////
+					
+					RelationalAlgebra op = new Join();
+					Join op1 = (Join)op;
+					
+					Scan node1 = new Scan();
+					Scan node2 = new Scan();
+					node1.fromitem = from;
+					node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
+					if(!alias.isEmpty())
+					{
+						//Added to handle alias in subquery select rr.* from (select * from R) rr;
+						node1.fromitem.setAlias(alias);
+						node2.fromitem.setAlias(alias);
+					}
+					
+					try {
+						node1.open();
+						node2.open();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					op1.node1 = node1;
+					op1.node2 = node2;
+					op = (RelationalAlgebra)op1;
+					RelTreeObj child = new RelTreeObj(op);
+					parent.attachChild(child);
+					parent = child;
+					leaf = child;
+					
+					////////////////////////////////////////////
 				}
-				
-				op1.node1 = node1;
-				op1.node2 = node2;
-				op = (RelationalAlgebra)op1;
-				RelTreeObj child = new RelTreeObj(op);
-				parent.attachChild(child);
-				parent = child;
-				leaf = child;
 				
 			}
 			else

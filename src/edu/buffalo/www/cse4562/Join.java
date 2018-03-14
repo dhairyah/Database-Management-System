@@ -10,7 +10,7 @@ import net.sf.jsqlparser.expression.PrimitiveValue;
 public class Join implements RelationalAlgebra{
 
 	public RelationalAlgebra node1, node2;
-	private Tuple current_left_tuple;
+	public Tuple current_left_tuple;
 	@Override
 	public boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
@@ -55,6 +55,35 @@ public class Join implements RelationalAlgebra{
 					e.printStackTrace();
 				};
 			}
+		}
+		else
+		{
+			//Scan scan1 = (Scan)node1;
+			Scan scan2  = (Scan)node2;
+			Tuple rightTuple = new Tuple();
+
+ 
+				while(scan2.hasNext())
+				{
+					//System.out.println("aaglu ret ayu");
+					rightTuple = scan2.retNext();
+				//	System.out.println("aaglu ret ayu : "+ rightTuple.record.toString());
+					tupleobj.tuple.clear();
+					tupleobj.colNames.clear();
+					tupleobj.tuple.addAll(current_left_tuple.tuple);
+					tupleobj.colNames.addAll(current_left_tuple.colNames);
+					tupleobj.tuple.addAll(rightTuple.tuple);
+					tupleobj.colNames.addAll(rightTuple.colNames);
+					return true;
+				}
+				//current_left_tuple = null;
+				try {
+					scan2.reset();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				};
+			
 		}
 		return false;
 	}
