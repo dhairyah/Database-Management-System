@@ -129,7 +129,7 @@ public class Main {
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{		
-		c=0;
+		//c=0;
 		//System.out.println("tc:"+c+" tl:"+l);
 		if(leafnode.getOperator() instanceof Scan)
 		{
@@ -512,6 +512,7 @@ public class Main {
 				if(body instanceof PlainSelect)
 				{
 					l=-1;
+					c=0;
 					PlainSelect plain = (PlainSelect)body;
 					if (plain.getLimit()!=null)
 					{	l=(int)plain.getLimit().getRowCount();
