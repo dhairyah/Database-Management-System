@@ -37,9 +37,11 @@ public class Scan  extends Tuple implements RelationalAlgebra
    {
 	   
 	   tablename = ((Table) fromitem).getName();
-	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+	   //System.out.println("Inopen tablename1:"+tablename);
+	   reader = Files.newBufferedReader(Paths.get("D://Eclipse//dbb//CSE4562SP18//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
-	   create = Main.map.get(tablename);
+	   create = Main.map.get(tablename.toLowerCase());
+	  //System.out.println("Inopen tablename2:"+create);
 	   //create.getTable().setAlias(string);(fromitem.getAlias());
 	   tupleobj = new Tuple();
 	   tupplelist = parser.iterator(); 
@@ -47,7 +49,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    
    public void reset() throws IOException
    {
-	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+	   reader = Files.newBufferedReader(Paths.get("D://Eclipse//dbb//CSE4562SP18//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   tupplelist = parser.iterator(); 
    }
@@ -75,6 +77,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		tupleobj.tuple.clear();
 		//tupleobj.columnNames.clear();
 		tupleobj.colNames.clear();
+		//System.out.println("coldef:"+create.getColumnDefinitions());
 		int numColumns = create.getColumnDefinitions().size();
 		for(int i = 0; i < numColumns; i++)
 		{
@@ -86,7 +89,14 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			Column tempCol = new Column(create.getTable(), colName);
 			tupleobj.colNames.add(tempCol);
 			
-			if(dataType.equalsIgnoreCase("int"))
+			if(dataType.equalsIgnoreCase("integer"))
+			{
+				//System.out.println("fdffd555");
+				String temp = tupple.get(i);
+				PrimitiveValue d = new LongValue(Long.valueOf(temp));
+				tupleobj.tuple.add(d);
+			}
+			else if(dataType.equalsIgnoreCase("int"))
 			{
 				//System.out.println("fdffd555");
 				String temp = tupple.get(i);
@@ -101,8 +111,10 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			}
 			else if(dataType.equalsIgnoreCase("date"))
 			{
+				//System.out.println("gonr");
 				String temp = tupple.get(i);
 				PrimitiveValue d = new DateValue(temp);
+				//System.out.println("d");
 				tupleobj.tuple.add(d);
 			}
 			else if(dataType.equalsIgnoreCase("varchar"))
@@ -131,7 +143,10 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			}
 		
 		tupleobj.table = create;
-		
+		//System.out.println("InScan_retNext:"+tupleobj.table.getColumnDefinitions());
+		//System.out.println("InSCan:"+fromitem.getAlias());
+		tupleobj.table.getTable().setAlias(fromitem.getAlias());//Changes 3/15 ////////////
+		//System.out.println("In_Scann:"+tupleobj.table.getTable().getAlias());
    
    }
    return tupleobj;
