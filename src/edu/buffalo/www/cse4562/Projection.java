@@ -67,6 +67,11 @@ public class Projection extends Tuple implements RelationalAlgebra
 							int size = t.colNames.size();
 							for(int it = 0; it < size; it++)
 							{
+								//System.out.print(arg0.getTable().getName());
+								//System.out.print(" "+t.colNames.get(it).getTable().getAlias());
+								//System.out.print("x"+arg0.getColumnName());
+								//System.out.println(" "+t.colNames.get(it).getColumnName());
+								//System.out.println(arg0.getColumnName().equalsIgnoreCase(t.colNames.get(it).getColumnName()));
 								if((arg0.getTable().getName().equalsIgnoreCase(t.colNames.get(it).getTable().getAlias())) && 
 								   (arg0.getColumnName().equalsIgnoreCase(t.colNames.get(it).getColumnName())))
 								{
@@ -74,7 +79,9 @@ public class Projection extends Tuple implements RelationalAlgebra
 									break;
 								}
 							}
+							
 						}
+						//System.out.println("t:"+t.tuple+"index:"+index);
 						return t.tuple.get(index);
 						
 					}
@@ -122,14 +129,15 @@ public class Projection extends Tuple implements RelationalAlgebra
 							 PrimitiveValue type = eval.eval(t.colNames.get(ind));
 							 tempTuple.add(type);
 							 tempColumnNames.add(t.colNames.get(ind));
+							 
 						 }
 					 }
-					 
+					//tempColumnNames.addAll(X.columnNames); 
 				 }
 				 
 		  }
 		  
-		  if(!subQuery_alias.isEmpty())
+		  if(subQuery_alias != null && !subQuery_alias.isEmpty()) //Changes 3/15
 		  {
 			  int size = tempColumnNames.size();
 			  for(int i = 0; i < size; i++)
