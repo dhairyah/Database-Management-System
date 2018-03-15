@@ -41,8 +41,13 @@ public class Selection extends Tuple implements RelationalAlgebra
 			  if(index == -1)
 				{
 					int size = tupleobj.colNames.size();
+					//System.out.println("s:"+size);
 					for(int it = 0; it < size; it++)
 					{
+	                      //System.out.print(arg0.getTable().getName()); 
+	                      //System.out.print(" "+tupleobj.colNames.get(it).getTable());///.getAlias());	
+	                      //System.out.print(" x "+arg0.getColumnName()); 
+	                      //System.out.println(" "+tupleobj.colNames.get(it).getColumnName());
 						if((arg0.getTable().getName().equalsIgnoreCase(tupleobj.colNames.get(it).getTable().getAlias())) && 
 						   (arg0.getColumnName().equalsIgnoreCase(tupleobj.colNames.get(it).getColumnName())))
 						{
@@ -58,7 +63,7 @@ public class Selection extends Tuple implements RelationalAlgebra
 		    public PrimitiveValue eval(InExpression arg0) throws SQLException {
 				
 				PrimitiveValue leftExpVal= eval(arg0.getLeftExpression());
-
+				 //System.out.println("k:"+leftExpVal); 
 				if(arg0.getItemsList() instanceof ItemsList)
 				{	
 
@@ -86,10 +91,8 @@ public class Selection extends Tuple implements RelationalAlgebra
 				
 			}
 		  
-		  
-		  
-		  
 		  };
+	  //System.out.println("exp:"+expression);	  
 	  PrimitiveValue type = eval.eval(expression);
 	  return type.toBool();
   }
