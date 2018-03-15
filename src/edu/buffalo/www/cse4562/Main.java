@@ -129,7 +129,7 @@ public class Main {
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{		
-		
+		c=0;
 		if(leafnode.getOperator() instanceof Scan)
 		{
 			Scan table = (Scan)leafnode.getOperator();
