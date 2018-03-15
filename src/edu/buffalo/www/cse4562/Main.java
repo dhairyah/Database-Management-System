@@ -503,7 +503,7 @@ public class Main {
 		Statement statement = parser.Statement();
 		while(statement != null) {
 			
-			System.out.println(statement);
+			//System.out.println(statement);
 			
 			
 			if(statement instanceof Select) {
