@@ -38,7 +38,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   
 	   tablename = ((Table) fromitem).getName();
 	   //System.out.println("Inopen tablename1:"+tablename);
-	   reader = Files.newBufferedReader(Paths.get("D://Eclipse//dbb//CSE4562SP18//"+tablename+".csv"));
+	   reader = Files.newBufferedReader(Paths.get("data"+tablename+".dat"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   create = Main.map.get(tablename.toLowerCase());
 	  //System.out.println("Inopen tablename2:"+create);
@@ -49,7 +49,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    
    public void reset() throws IOException
    {
-	   reader = Files.newBufferedReader(Paths.get("D://Eclipse//dbb//CSE4562SP18//"+tablename+".csv"));
+	   reader = Files.newBufferedReader(Paths.get("data"+tablename+".dat"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   tupplelist = parser.iterator(); 
    }
