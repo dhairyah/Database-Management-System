@@ -123,13 +123,14 @@ public class Main {
 	
 	//static CreateTable create;
 	static HashMap<String, CreateTable> map = new HashMap<>();
-        static int l=-1;
+    static int l=-1;
 	static int c=0;
 	static int f=0;
 	
 	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
 	{		
 		c=0;
+		//System.out.println("tc:"+c+" tl:"+l);
 		if(leafnode.getOperator() instanceof Scan)
 		{
 			Scan table = (Scan)leafnode.getOperator();
@@ -144,10 +145,10 @@ public class Main {
 			{
 				if(c==l && f==0)
 				{
+					//System.out.println("ccc:"+c+" ll:"+l);
 					break;
 				}
 				tupleobj = table.retNext();
-	
 				parentnode = leafnode.retParent();
 				printflag = 1;
 				
@@ -162,6 +163,7 @@ public class Main {
 					 {
 						 blockOperator = 1;
 						 f=1;
+						 //System.out.println("block");
 						 orderby = (OrderBy)parentnode.getOperator();
 					 }
 					 parentnode = parentnode.retParent();
@@ -169,6 +171,7 @@ public class Main {
 					}
 					else
 					{
+						//System.out.println("break");
 						printflag = 0;
 						break;
 					}
@@ -180,15 +183,18 @@ public class Main {
 					{
 						System.out.print(tupleobj.tuple.get(i) + "|");
 					}
+					///System.out.println("not_going");
 					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+					c++;
 				}
-				
-				c++;
+				//System.out.println("Incrementing");
+				//c++;
 				
 			}
 			
 			if(blockOperator==1)
 			{
+				//System.out.println("ddddd");
 				orderby.sortAndPrint(l);
 			}
 		}
@@ -205,14 +211,17 @@ public class Main {
 			{
 				parentnode = leafnode.retParent();
 				printflag = 1;
+				//System.out.println("c:"+c+" l:"+l);
 				if(c==l && f==0)
 				{
+					//System.out.println("bbreakk");
 					break;
 				}
 				
 				//added join 3 table join
 				if(parentnode.getOperator() instanceof Join)
 				{
+					//System.out.println("ii");
 					Join innode  = (Join)parentnode.getOperator();
 					innode.current_left_tuple = tupleobj;
 				//	System.out.println("rg0+"+tupleobj);
@@ -237,6 +246,7 @@ public class Main {
 					else
 					{
 						printflag = 0;
+						//System.out.println("tgee");
 						break;
 					}
 				}
@@ -248,12 +258,15 @@ public class Main {
 						System.out.print(tupleobj.tuple.get(i) + "|");
 					}
 					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+					c++;
 				}
-			c++;	
+			//System.out.println("incrementing");	
+			//c++;	
 			}
 			
 			if(blockOperator==1)
 			{
+				System.out.println("goiing");
 				orderby.sortAndPrint(l);
 			}
 		}
@@ -360,12 +373,13 @@ public class Main {
 					 Scan node22 = new Scan();
 					 node11 = op11;
 					 node22.fromitem = (FromItem) query.getJoins().get(nux-1).getRightItem();
-					 System.out.println("xxmain:"+node22.fromitem);
-					 if(!alias.isEmpty())
+					 node22.fromitem.setAlias(query.getJoins().get(nux-1).getRightItem().getAlias());
+					// System.out.println("xxmain:"+node22.fromitem);
+					 if(query.getJoins().get(nux-1).getRightItem().getAlias() != null && !query.getJoins().get(nux-1).getRightItem().getAlias().isEmpty() )
 					 {
 						//Added to handle alias in subquery select rr.* from (select * from R) rr;
 						//node1.fromitem.setAlias(alias);
-						node22.fromitem.setAlias(alias);
+						node22.fromitem.setAlias(query.getJoins().get(nux-1).getRightItem().getAlias());
 					 } 
 					
 					 try {
@@ -397,11 +411,15 @@ public class Main {
 					Scan node2 = new Scan();
 					node1.fromitem = from;
 					node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
-					if(!alias.isEmpty())
+					if(alias != null && !alias.isEmpty())
 					{
 						//Added to handle alias in subquery select rr.* from (select * from R) rr;
 						node1.fromitem.setAlias(alias);
-						node2.fromitem.setAlias(alias);
+						
+					}
+					if(query.getJoins().get(0).getRightItem().getAlias()!=null && !query.getJoins().get(0).getRightItem().getAlias().isEmpty())
+					{
+						node2.fromitem.setAlias(query.getJoins().get(0).getRightItem().getAlias());
 					}
 					
 					try {
@@ -444,11 +462,12 @@ public class Main {
 				{			
 						
 					op1.fromitem = from;
-					/*if(alias != null && !alias.isEmpty())
+					if(alias != null && !alias.isEmpty()) ///Changes 3/15 ///////////////////
 					{
+						//System.out.println("li:"+alias);
 						//Added to handle alias in subquery select rr.* from (select * from R) rr;
-						//op1.fromitem.setAlias(alias);
-					}*/
+						op1.fromitem.setAlias(alias);
+					}
 					op = (RelationalAlgebra)op1;
 					RelTreeObj child = new RelTreeObj(op);
 					parent.attachChild(child);
@@ -492,11 +511,14 @@ public class Main {
 				SelectBody body = select.getSelectBody();
 				if(body instanceof PlainSelect)
 				{
+					l=-1;
 					PlainSelect plain = (PlainSelect)body;
 					if (plain.getLimit()!=null)
-					{	l=(int)plain.getLimit().getRowCount(); }
-					
-					treebounds = createTree(plain,"");
+					{	l=(int)plain.getLimit().getRowCount();
+					//System.out.println("limitL:"+l);
+					}
+				     //System.out.println("alias:"+plain.getFromItem().getAlias());
+					treebounds = createTree(plain,plain.getFromItem().getAlias());
 					
 					try 
 					{
@@ -516,7 +538,7 @@ public class Main {
 				//create = (CreateTable)statement;
 				CreateTable create1 = (CreateTable) statement;
 				int k = 0;
-				String tableName = create1.getTable().getName();
+				String tableName = create1.getTable().getName().toLowerCase() ;
 				map.put(tableName, create1);
 				/*try {
 					test();
@@ -527,11 +549,6 @@ public class Main {
 				}
 				System.exit(0);*/
 			}
-			
-			
-			
- 
-			
 			System.out.println(prompt);
             System.out.flush();
 			statement = parser.Statement();
