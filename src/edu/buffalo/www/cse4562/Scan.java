@@ -29,7 +29,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    Reader reader=null;
    public String tablename;
    CSVParser parser=null;
-   CreateTable create=null;
+   CreateTable create=new CreateTable();
    Tuple tupleobj = null;
    Iterator<CSVRecord> tupplelist = null;
    
@@ -37,19 +37,24 @@ public class Scan  extends Tuple implements RelationalAlgebra
    {
 	   
 	   tablename = ((Table) fromitem).getName();
-	   //System.out.println("Inopen tablename1:"+tablename);
-	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+	   reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
-	   create = Main.map.get(tablename.toLowerCase());
-	  //System.out.println("Inopen tablename2:"+create);
-	   //create.getTable().setAlias(string);(fromitem.getAlias());
+	   CreateTable temp = Main.map.get(tablename.toLowerCase());
+	   List<ColumnDefinition> temp_colDef = new ArrayList<ColumnDefinition>();
+	   temp_colDef = temp.getColumnDefinitions();
+	   create.setColumnDefinitions(temp_colDef);
+	   create.setIndexes(temp.getIndexes());
+	   Table temp_table = new Table(temp.getTable().getName());
+	   create.setTable(temp_table);
+	   create.setTableOptionsStrings(temp.getTableOptionsStrings());
+	   create.getTable().setAlias(fromitem.getAlias());
 	   tupleobj = new Tuple();
-	   tupplelist = parser.iterator(); 
+	   tupplelist = parser.iterator();
    }
    
    public void reset() throws IOException
    {
-	   reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+	   reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   tupplelist = parser.iterator(); 
    }

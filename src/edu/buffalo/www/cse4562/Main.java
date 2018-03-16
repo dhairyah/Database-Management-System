@@ -414,7 +414,7 @@ public class Main {
 					if(alias != null && !alias.isEmpty())
 					{
 						//Added to handle alias in subquery select rr.* from (select * from R) rr;
-						node1.fromitem.setAlias(alias);
+						node1.fromitem.setAlias(query.getFromItem().getAlias());
 						
 					}
 					if(query.getJoins().get(0).getRightItem().getAlias()!=null && !query.getJoins().get(0).getRightItem().getAlias().isEmpty())
@@ -519,7 +519,7 @@ public class Main {
 					//System.out.println("limitL:"+l);
 					}
 				     //System.out.println("alias:"+plain.getFromItem().getAlias());
-					treebounds = createTree(plain,plain.getFromItem().getAlias());
+					treebounds = createTree(plain,"");
 					
 					try 
 					{
