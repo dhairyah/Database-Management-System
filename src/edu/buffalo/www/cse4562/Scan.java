@@ -160,12 +160,13 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		//System.out.println("In_Scann:"+tupleobj.table.getTable().getAlias());
    
    }
-		for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+	/*	for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
 		{
 			System.err.print(tupleobj.tuple.get(i) + "|");
 		}
 		///System.out.println("not_going");
 		System.err.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+		*/
    return tupleobj;
    }
    else
