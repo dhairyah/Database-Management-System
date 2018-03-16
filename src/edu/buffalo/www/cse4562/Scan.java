@@ -32,6 +32,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
    CreateTable create=new CreateTable();
    Tuple tupleobj = null;
    Iterator<CSVRecord> tupplelist = null;
+   public boolean isOpen = false;
    
    public void open() throws IOException
    {
@@ -50,6 +51,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   create.getTable().setAlias(fromitem.getAlias());
 	   tupleobj = new Tuple();
 	   tupplelist = parser.iterator();
+	   isOpen = true;
    }
    
    public void reset() throws IOException
@@ -57,6 +59,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
 	   parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 	   tupplelist = parser.iterator(); 
+	   isOpen = false;
    }
    
    boolean hasNext()

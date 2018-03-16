@@ -3,6 +3,7 @@ package edu.buffalo.www.cse4562;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.PrimitiveValue;
@@ -56,7 +57,7 @@ public class Join implements RelationalAlgebra{
 				};
 			}
 		}
-		else
+		else if(node1 instanceof Join && node2 instanceof Scan)
 		{
 			//Scan scan1 = (Scan)node1;
 			Scan scan2  = (Scan)node2;
@@ -83,6 +84,33 @@ public class Join implements RelationalAlgebra{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				};
+			
+		}
+		else if((node1 instanceof Join && node2 instanceof ScanPlainSelect))
+		{
+			
+			ScanPlainSelect scan2  = (ScanPlainSelect)node2;
+			Tuple rightTuple = new Tuple();
+
+ 
+				while(true)
+				{
+					rightTuple = scan2.retNext();
+					if(rightTuple.tuple.isEmpty())
+					{
+						break;
+					}
+					tupleobj.tuple.clear();
+					tupleobj.colNames.clear();
+					tupleobj.tuple.addAll(current_left_tuple.tuple);
+					tupleobj.colNames.addAll(current_left_tuple.colNames);
+					tupleobj.tuple.addAll(rightTuple.tuple);
+					tupleobj.colNames.addAll(rightTuple.colNames);
+					return true;
+				}
+				scan2.reset();
+			
+			
 			
 		}
 		return false;
