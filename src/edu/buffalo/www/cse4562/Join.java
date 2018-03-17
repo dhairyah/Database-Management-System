@@ -113,7 +113,7 @@ public class Join implements RelationalAlgebra{
 			
 			
 		}
-		else if(node1 instanceof ScanPlainSelect && node2 instanceof Scan)
+		/*else if(node1 instanceof ScanPlainSelect && node2 instanceof Scan)
 		{
 			Scan scan1 = (Scan)node2;
 			ScanPlainSelect scan2  = (ScanPlainSelect)node1;
@@ -152,7 +152,7 @@ public class Join implements RelationalAlgebra{
 				current_left_tuple = null;
 				scan2.reset();;
 			}
-		}
+		}*/
 		return false;
 	}
 
