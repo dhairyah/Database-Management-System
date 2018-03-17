@@ -89,7 +89,8 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		int numColumns = create.getColumnDefinitions().size();
 		for(int i = 0; i < numColumns; i++)
 		{
-			String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
+			//String dataType = create.getColumnDefinitions().get(i).getColDataType().toString();
+			ColDataType dataType = create.getColumnDefinitions().get(i).getColDataType();
 			String colName = create.getColumnDefinitions().get(i).getColumnName();
 			String lowercolname = colName.toLowerCase();
 				//System.out.println("l:"+dataType);
@@ -97,27 +98,27 @@ public class Scan  extends Tuple implements RelationalAlgebra
 			Column tempCol = new Column(create.getTable(), colName);
 			tupleobj.colNames.add(tempCol);
 			
-			if(dataType.equalsIgnoreCase("integer"))
+			if(dataType.getDataType().equals("INTEGER"))
 			{
 				//System.out.println("fdffd555");
 				String temp = tupple.get(i);
 				PrimitiveValue d = new LongValue(Long.valueOf(temp));
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("int"))
+			else if(dataType.getDataType().equals("INT"))
 			{
 				//System.out.println("fdffd555");
 				String temp = tupple.get(i);
 				PrimitiveValue d = new LongValue(Long.valueOf(temp));
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("string"))
+			else if(dataType.getDataType().equals("STRING"))
 			{
 				String temp = tupple.get(i);
 				PrimitiveValue d = new StringValue(temp);
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("date"))
+			else if(dataType.getDataType().equals("DATE"))
 			{
 				//System.out.println("gonr");
 				String temp = tupple.get(i);
@@ -125,19 +126,19 @@ public class Scan  extends Tuple implements RelationalAlgebra
 				//System.out.println("d");
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("varchar"))
+			else if(dataType.getDataType().equals("VARCHAR"))
 			{
 				String temp = tupple.get(i);
 				PrimitiveValue d = new StringValue(temp);
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("char"))
+			else if(dataType.getDataType().equals("CHAR"))
 			{
 				String temp = tupple.get(i);
 				PrimitiveValue d = new StringValue(temp);
 				tupleobj.tuple.add(d);
 			}
-			else if(dataType.equalsIgnoreCase("double"))
+			else if(dataType.getDataType().equals("DOUBLE"))
 			{
 				String temp = tupple.get(i);
 				PrimitiveValue d = new DoubleValue(temp);

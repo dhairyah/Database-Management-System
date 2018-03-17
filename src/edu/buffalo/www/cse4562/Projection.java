@@ -31,7 +31,7 @@ public class Projection extends Tuple implements RelationalAlgebra
 		  Tuple X;
 		  X = t;
 		  List<String> sl = new ArrayList<String>();
-		  List<Integer> il = new ArrayList<Integer>();
+		  //List<Integer> il = new ArrayList<Integer>();
 		  List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 		  List<Column> tempColumnNames = new ArrayList<Column>();
 			  for(int j=0;j<ts;j++)
@@ -42,11 +42,11 @@ public class Projection extends Tuple implements RelationalAlgebra
 			  }
 		//  System.out.println("sl +"+sl);
 		  
-		  for(int j=0;j<ps;j++)
-		  {
-             String tt=projection.get(j).toString();
-             il.add(sl.indexOf(tt));
-		  }
+		 // for(int j=0;j<ps;j++)
+		  //{
+             //String tt=projection.get(j).toString();
+             //il.add(sl.indexOf(tt));
+		  //}
 		//  System.out.println("il = " + il+" and ps"+ps);
 		  
 		  for (int j = 0; j < ps; j++)
