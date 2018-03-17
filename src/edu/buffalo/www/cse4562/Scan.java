@@ -175,7 +175,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		///System.out.println("not_going");
 		System.err.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 		*/
-		if(tupleobj.table.getTable().getName().equals("PLAYERS"))
+		if(testing == true)
 		{
 
 			AndExpression exp = (AndExpression)expression;

@@ -108,6 +108,7 @@ import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -471,7 +472,11 @@ public class Main {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						node1.expression = exp;
+						if(query.getJoins().size() == 1 && ((Table) query.getFromItem()).getName().equals(((Table) query.getJoins().get(0).getRightItem()).getName()))
+						{
+							node1.expression = exp;
+							node1.testing = true;
+						}
 						op1.node1 = node1;
 					}
 					
@@ -508,7 +513,11 @@ public class Main {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						node2.expression=exp;
+						if(query.getJoins().size() == 1 && ((Table) query.getFromItem()).getName().equals(((Table) query.getJoins().get(0).getRightItem()).getName()))
+						{
+							node2.expression = exp;
+							node2.testing = true;
+						}
 						op1.node2 = node2;
 					}
 					
