@@ -441,7 +441,7 @@ public class Main {
 					{
 						ScanPlainSelect node1 = new ScanPlainSelect();
 						node1.query = (PlainSelect) ((SubSelect) from).getSelectBody();
-						if(alias != null && !alias.isEmpty())
+						if((alias != null && !alias.isEmpty()) || !query.getFromItem().getAlias().isEmpty())
 						{
 							//Added to handle alias in subquery select rr.* from (select * from R) rr;
 							node1.subSelctAlias = query.getFromItem().getAlias();
@@ -459,7 +459,7 @@ public class Main {
 					{
 						Scan node1 = new Scan();
 						node1.fromitem = from;
-						if(alias != null && !alias.isEmpty())
+						if((alias != null && !alias.isEmpty()) || !query.getFromItem().getAlias().isEmpty())
 						{
 							//Added to handle alias in subquery select rr.* from (select * from R) rr;
 							node1.fromitem.setAlias(query.getFromItem().getAlias());
