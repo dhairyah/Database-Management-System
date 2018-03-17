@@ -1,5 +1,9 @@
 package edu.buffalo.www.cse4562;
+import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.PrimitiveValue.InvalidPrimitive;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.*;
 import net.sf.jsqlparser.parser.CCJSqlParser.*;
 import net.sf.jsqlparser.schema.Column;
@@ -33,6 +37,8 @@ public class Scan  extends Tuple implements RelationalAlgebra
    Tuple tupleobj = null;
    Iterator<CSVRecord> tupplelist = null;
    public boolean isOpen = false;
+   public Expression expression;
+   public boolean testing =false;
    
    public void open() throws IOException
    {
@@ -77,12 +83,12 @@ public class Scan  extends Tuple implements RelationalAlgebra
  	  return true;
    }
    
-   public Tuple retNext()
+   public Tuple retNext() throws SQLException
    {
 	      
 	   if(tupplelist.hasNext())
 	   {
-		
+		//Expression left = expression.
 		CSVRecord tupple = tupplelist.next();
 		tupleobj.record = tupple;
 		tupleobj.tuple.clear();
@@ -158,6 +164,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		//System.out.println("InScan_retNext:"+tupleobj.table.getColumnDefinitions());
 		//System.out.println("InSCan:"+fromitem.getAlias());
 		tupleobj.table.getTable().setAlias(fromitem.getAlias());//Changes 3/15 ////////////
+		
 		//System.out.println("In_Scann:"+tupleobj.table.getTable().getAlias());
    
    }
@@ -168,6 +175,71 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		///System.out.println("not_going");
 		System.err.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 		*/
+		if(tupleobj.table.getTable().getName().equals("PLAYERS"))
+		{
+
+			AndExpression exp = (AndExpression)expression;
+			GreaterThan left = (GreaterThan) ((AndExpression)(exp.getLeftExpression())).getRightExpression();
+			GreaterThan right = (GreaterThan)exp.getRightExpression();
+			Eval eval = new Eval() {
+
+				@Override
+				public PrimitiveValue eval(Column arg0) throws SQLException {
+				//	System.out.println("ts:"+t.tuple+" andarg : "+arg0);
+					// TODO Auto-generated method stub
+					//String columnName = arg0.getColumnName();
+					//String lowercolname = columnName.toLowerCase();
+					//int index = sl.indexOf(columnName);
+					//int index = t.columnNames.indexOf(lowercolname);
+					int index = tupleobj.colNames.indexOf(arg0);
+					//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
+					if(index == -1)
+					{
+						int size = tupleobj.colNames.size();
+						for(int it = 0; it < size; it++)
+						{
+							//System.out.print(" "+t.colNames.get(it).getTable().getAlias());
+							//System.out.print("x"+arg0.getColumnName());
+							//System.out.println(" "+t.colNames.get(it).getColumnName());
+							//System.out.println(arg0.getColumnName().equalsIgnoreCase(t.colNames.get(it).getColumnName()));
+							if((arg0.getTable().getName().equalsIgnoreCase(tupleobj.colNames.get(it).getTable().getAlias())) && 
+							   (arg0.getColumnName().equalsIgnoreCase(tupleobj.colNames.get(it).getColumnName())))
+							{
+								index = it;
+								break;
+							}
+						}
+						
+					}
+				//	System.out.println("te:"+t.tuple+"index:"+index);
+					if(index > -1)
+					{
+						return tupleobj.tuple.get(index);
+					}
+					else
+					{
+						return null;
+					}
+					
+				}
+			 };
+			 
+			 PrimitiveValue type_left = eval.eval(left);
+			 PrimitiveValue type_right = eval.eval(right);
+			  
+			if((type_left != null && !type_left.toBool()) || (type_right !=null && !type_right.toBool()))
+			{
+				if(tupplelist.hasNext())
+				{
+					tupleobj=retNext();
+				}
+				else
+				{
+					return tupleobj;
+				}
+			}
+		
+		}
    return tupleobj;
    }
    else

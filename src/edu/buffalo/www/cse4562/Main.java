@@ -331,6 +331,7 @@ public class Main {
 		FromItem from = query.getFromItem();
 		if(from != null) {
 			//System.out.println("xx:"+query.getJoins());
+			
 			if(query.getJoins()!=null)
 			{
 				int nux=query.getJoins().size();
@@ -470,6 +471,7 @@ public class Main {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						node1.expression = exp;
 						op1.node1 = node1;
 					}
 					
@@ -506,6 +508,7 @@ public class Main {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						node2.expression=exp;
 						op1.node2 = node2;
 					}
 					
