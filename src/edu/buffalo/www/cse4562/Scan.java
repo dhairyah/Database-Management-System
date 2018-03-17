@@ -51,6 +51,9 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   create.getTable().setAlias(fromitem.getAlias());
 	   tupleobj = new Tuple();
 	   tupplelist = parser.iterator();
+	   
+	 //  System.err.println("size : " +parser.getRecords().size());
+	  // System.out.println("size11 : " +parser.getRecords().size());
 	   isOpen = true;
    }
    
@@ -158,6 +161,13 @@ public class Scan  extends Tuple implements RelationalAlgebra
 		//System.out.println("In_Scann:"+tupleobj.table.getTable().getAlias());
    
    }
+	/*	for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+		{
+			System.err.print(tupleobj.tuple.get(i) + "|");
+		}
+		///System.out.println("not_going");
+		System.err.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+		*/
    return tupleobj;
    }
    else
