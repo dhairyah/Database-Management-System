@@ -65,8 +65,9 @@ public class Selection2 extends RelationalAlgebra2{
 
 	@Override
 	List<Column> open() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		List<Column> cn=null;
+		cn=colNamesChild;
+		return cn;
 	}
 
 	@Override
