@@ -28,7 +28,8 @@ public class Projection2 extends RelationalAlgebra2{
 
 	@Override
 	List<Column> open() throws IOException {
-		// TODO Auto-generated method stub
+		List<Column> cn=null;
+		cn= Colu
 		return null;
 	}
 
