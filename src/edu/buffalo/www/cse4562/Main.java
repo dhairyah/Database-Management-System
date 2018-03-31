@@ -648,6 +648,7 @@ public class Main {
 				CreateTable create1 = (CreateTable) statement;
 				int k = 0;
 				String tableName = create1.getTable().getName().toLowerCase() ;
+				System.out.println("S:"+create1.getColumnDefinitions());
 				map.put(tableName, create1);
 				/*try {
 					test();

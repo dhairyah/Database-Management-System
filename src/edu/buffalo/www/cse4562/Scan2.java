@@ -49,11 +49,12 @@ public class Scan2 extends RelationalAlgebra2 {
 
 	public List<Column> open() throws IOException
 	{
-
+		List<Column> cn=null;
 		tablename = ((Table) fromitem).getName();
 		reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
 		parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 		CreateTable temp = Main.map.get(tablename.toLowerCase());
+		
 		List<ColumnDefinition> temp_colDef = new ArrayList<ColumnDefinition>();
 		temp_colDef = temp.getColumnDefinitions();
 		create.setColumnDefinitions(temp_colDef);
@@ -64,11 +65,19 @@ public class Scan2 extends RelationalAlgebra2 {
 		create.getTable().setAlias(fromitem.getAlias());
 		tupleobj = new Tuple();
 		tupplelist = parser.iterator();
-
+        for(int i=0;i<temp.getColumnDefinitions().size();i++)
+        {
+        	String colName = create.getColumnDefinitions().get(i).getColumnName();
+        	Column tempCol = new Column(create.getTable(), colName);
+			cn.add(tempCol);
+        }
 		//  System.err.println("size : " +parser.getRecords().size());
 		// System.out.println("size11 : " +parser.getRecords().size());
 		isOpen = true;
-		return null;
+		colNamesParent=cn;
+		colNamesChild=cn;
+		return (cn);
+		
 	}
 
 	public void reset() throws IOException
