@@ -32,14 +32,14 @@ public class Selection2 extends RelationalAlgebra2{
 		Eval eval = new Eval() {
 			@Override
 			public PrimitiveValue eval(Column arg0) throws SQLException {
-				int index = tupleobj.colNames.indexOf(arg0);
+				int index = colNamesChild.indexOf(arg0);
 				if(index == -1)
 				{
-					int size = tupleobj.colNames.size();
+					int size = colNamesChild.size();
 					for(int it = 0; it < size; it++)
 					{
-						if((arg0.getTable().getName().equalsIgnoreCase(tupleobj.colNames.get(it).getTable().getAlias())) && 
-								(arg0.getColumnName().equalsIgnoreCase(tupleobj.colNames.get(it).getColumnName())))
+						if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+								(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
 						{
 							index = it;
 							break;
@@ -65,9 +65,9 @@ public class Selection2 extends RelationalAlgebra2{
 
 	@Override
 	List<Column> open() throws IOException {
-		List<Column> cn=null;
-		cn=colNamesChild;
-		return cn;
+		colNamesChild = leftChild.open();
+		colNamesParent.addAll(colNamesChild);
+		return colNamesParent;
 	}
 
 	@Override
