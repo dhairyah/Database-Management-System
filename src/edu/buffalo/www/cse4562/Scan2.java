@@ -156,6 +156,7 @@ public class Scan2 extends RelationalAlgebra2 {
 				}
 
 				tupleobj.table = create;
+				
 				tupleobj.table.getTable().setAlias(fromitem.getAlias());
 
 			}
