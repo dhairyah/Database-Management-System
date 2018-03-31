@@ -28,9 +28,9 @@ public class Projection2 extends RelationalAlgebra2{
 
 	@Override
 	List<Column> open() throws IOException {
-		List<Column> cn=null;
-		cn= Colu
-		return null;
+		colNamesChild = leftChild.open();
+		colNamesParent.addAll(colNamesChild);
+		return colNamesParent;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class Projection2 extends RelationalAlgebra2{
 	Tuple retNext() throws SQLException {
 		int ps= projection.size();
 		Tuple t = leftChild.retNext();
-		int ts = t.colNames.size();
+		int ts = colNamesChild.size();
 		Tuple X;
 		X = t;
 		List<String> sl = new ArrayList<String>();
@@ -52,7 +52,7 @@ public class Projection2 extends RelationalAlgebra2{
 		List<Column> tempColumnNames = new ArrayList<Column>();
 		for(int j=0;j<ts;j++)
 		{
-			String tt = t.colNames.get(j).getColumnName();
+			String tt = colNamesChild.get(j).getColumnName();
 			sl.add(tt);
 		}
 
@@ -62,15 +62,15 @@ public class Projection2 extends RelationalAlgebra2{
 
 				@Override
 				public PrimitiveValue eval(Column arg0) throws SQLException {
-					int index = t.colNames.indexOf(arg0);
+					int index = colNamesChild.indexOf(arg0);
 					//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
 					if(index == -1)
 					{
-						int size = t.colNames.size();
+						int size = colNamesChild.size();
 						for(int it = 0; it < size; it++)
 						{
-							if((arg0.getTable().getName().equalsIgnoreCase(t.colNames.get(it).getTable().getAlias())) && 
-									(arg0.getColumnName().equalsIgnoreCase(t.colNames.get(it).getColumnName())))
+							if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+									(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
 							{
 								index = it;
 								break;
@@ -114,31 +114,31 @@ public class Projection2 extends RelationalAlgebra2{
 			{
 				//	 System.out.println("saalc");
 				tempTuple.addAll(t.tuple);
-				tempColumnNames.addAll(X.colNames);
+				tempColumnNames.addAll(colNamesChild);
 			}
 			else if (i instanceof AllTableColumns)
 			{
 				//	 System.out.println("alltabc");
 				AllTableColumns tab = (AllTableColumns) i;
 				Table tab_name = tab.getTable();
-				int numCols = t.colNames.size();
+				int numCols = colNamesChild.size();
 				for(int ind = 0; ind < numCols; ind++)
 				{
 
 					// System.out.println("inside for");
-					if(t.colNames.get(ind).getTable().getAlias() != null)
+					if(colNamesChild.get(ind).getTable().getAlias() != null)
 					{
 						// System.out.println("pehif+ pec : "+tab_name.getName()+" and tabname +"+ t.colNames.get(ind).getTable().getName()+" and ali+"+t.colNames.get(ind).getTable().getAlias());
 
-						if((t.colNames.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (t.colNames.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
+						if((colNamesChild.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (colNamesChild.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
 						{
 
 							// System.out.println("beef");
-							PrimitiveValue type = eval.eval(t.colNames.get(ind));
+							PrimitiveValue type = eval.eval(colNamesChild.get(ind));
 							tempTuple.add(type);
-							Table temp_tab = new Table(t.colNames.get(ind).getTable().getName());
-							temp_tab.setAlias(t.colNames.get(ind).getTable().getAlias());
-							Column temp = new Column(temp_tab, t.colNames.get(ind).getColumnName());
+							Table temp_tab = new Table(colNamesChild.get(ind).getTable().getName());
+							temp_tab.setAlias(colNamesChild.get(ind).getTable().getAlias());
+							Column temp = new Column(temp_tab, colNamesChild.get(ind).getColumnName());
 							tempColumnNames.add(temp);
 
 						}
