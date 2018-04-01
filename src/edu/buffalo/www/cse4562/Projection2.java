@@ -133,7 +133,6 @@ public class Projection2 extends RelationalAlgebra2{
 		X = t;
 		List<String> sl = new ArrayList<String>();
 		List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
-		List<Column> tempColumnNames = new ArrayList<Column>();
 		for(int j=0;j<ts;j++)
 		{
 			String tt = colNamesChild.get(j).getColumnName();
@@ -176,26 +175,10 @@ public class Projection2 extends RelationalAlgebra2{
 				PrimitiveValue type = eval.eval(expr);
 
 				tempTuple.add(type);
-				if(alias != null)
-				{
-
-					Column col = new Column();
-					col.setColumnName(alias);
-					Table tab_temp = new Table();
-					col.setTable(tab_temp);
-					tempColumnNames.add((Column)col);
-				}
-				else
-				{
-					tempColumnNames.add((Column)expr);
-				}
-				int lop = 2;
 			}
 			else if(i instanceof AllColumns )
 			{
-				//	 System.out.println("saalc");
 				tempTuple.addAll(t.tuple);
-				tempColumnNames.addAll(colNamesChild);
 			}
 			else if (i instanceof AllTableColumns)
 			{
@@ -213,39 +196,20 @@ public class Projection2 extends RelationalAlgebra2{
 
 						if((colNamesChild.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (colNamesChild.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
 						{
-
 							// System.out.println("beef");
 							PrimitiveValue type = eval.eval(colNamesChild.get(ind));
 							tempTuple.add(type);
-							Table temp_tab = new Table(colNamesChild.get(ind).getTable().getName());
-							temp_tab.setAlias(colNamesChild.get(ind).getTable().getAlias());
-							Column temp = new Column(temp_tab, colNamesChild.get(ind).getColumnName());
-							tempColumnNames.add(temp);
-
 						}
 					}
 
 				}
-				//tempColumnNames.addAll(X.colNames); 
 			}
 
 		}
 
-		if(subQuery_alias != null && !subQuery_alias.isEmpty()) //Changes 3/15
-		{
-			int size = tempColumnNames.size();
-			for(int i = 0; i < size; i++)
-			{
-
-				//System.out.println("Alias set+"+tempColumnNames.get(i).getTable()+" and subQuery_alias + "+ subQuery_alias);
-				tempColumnNames.get(i).getTable().setAlias(subQuery_alias);
-			}
-		}
 
 		t.tuple.clear();
 		t.tuple.addAll(tempTuple);
-		t.colNames.clear();
-		t.colNames.addAll(tempColumnNames);
 
 		return t;
 	}
