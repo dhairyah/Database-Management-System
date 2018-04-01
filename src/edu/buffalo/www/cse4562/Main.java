@@ -181,14 +181,17 @@ public class Main {
 			RelationalAlgebra2 op = new Projection2();
 			Projection2 op1= (Projection2)op;
 			op1.projection = selItem;
-			op= (RelationalAlgebra2)op1 ;
+			
 			if(rootCreated == 0)
 			{
+				op1.subQuery_alias = alias;
+				op= (RelationalAlgebra2)op1;
 				op.parent = null;
 				root = op;
 			}
 			else
 			{
+				op= (RelationalAlgebra2)op1;
 				op.parent = parent;
 				
 			}

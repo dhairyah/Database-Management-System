@@ -31,8 +31,6 @@ public class Projection2 extends RelationalAlgebra2{
 		colNamesChild = leftChild.open();
 		colNamesParent.addAll(colNamesChild);
 		List<Column> tempColumnNames = new ArrayList<Column>();
-		colNamesChild = leftChild.open();
-		colNamesParent.addAll(colNamesChild);
 		int ps= projection.size();	
 		for(int j=0;j<ps;j++)
 		{	
