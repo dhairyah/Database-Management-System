@@ -30,7 +30,88 @@ public class Projection2 extends RelationalAlgebra2{
 	List<Column> open() throws IOException {
 		colNamesChild = leftChild.open();
 		colNamesParent.addAll(colNamesChild);
-		return colNamesParent;
+		List<Column> tempColumnNames = new ArrayList<Column>();
+		colNamesChild = leftChild.open();
+		colNamesParent.addAll(colNamesChild);
+	    int ps= projection.size();	
+	for(int j=0;j<ps;j++)
+	{	
+	 SelectItem i = projection.get(j);
+	   if(i instanceof SelectExpressionItem)
+       {
+		 // System.out.println("selexpr");
+		 SelectExpressionItem k = (SelectExpressionItem)i;
+		 String alias = k.getAlias();
+		 Expression expr = k.getExpression();
+		 // System.out.println("sel :"+expr);
+		 //PrimitiveValue type = eval.eval(expr);
+		 //tempTuple.add(type);
+		 if(alias != null)
+		 {
+			 //need to modify schema;
+			 //int test = 0;
+			 Column col = new Column();
+			 col.setColumnName(alias);
+			 Table tab_temp = new Table();
+		  	 col.setTable(tab_temp);
+		 	 tempColumnNames.add((Column)col);
+		 }
+		 else
+	    	{
+		 	 tempColumnNames.add((Column)expr);
+		    }
+		 int lop = 2;
+	    }
+	    else if(i instanceof AllColumns )
+		{
+			//	 System.out.println("saalc");
+			//tempTuple.addAll(t.tuple);
+			tempColumnNames.addAll(colNamesChild);
+		}
+		else if (i instanceof AllTableColumns)
+		{
+			//	 System.out.println("alltabc");
+			AllTableColumns tab = (AllTableColumns) i;
+			Table tab_name = tab.getTable();
+			int numCols = colNamesChild.size();
+			for(int ind = 0; ind < numCols; ind++)
+			{
+
+				// System.out.println("inside for");
+				if(colNamesChild.get(ind).getTable().getAlias() != null)
+				{
+					// System.out.println("pehif+ pec : "+tab_name.getName()+" and tabname +"+ t.colNames.get(ind).getTable().getName()+" and ali+"+t.colNames.get(ind).getTable().getAlias());
+
+					if((colNamesChild.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (colNamesChild.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
+					{
+
+						// System.out.println("beef");
+						//PrimitiveValue type = eval.eval(colNamesChild.get(ind));
+						//tempTuple.add(type);
+						Table temp_tab = new Table(colNamesChild.get(ind).getTable().getName());
+						temp_tab.setAlias(colNamesChild.get(ind).getTable().getAlias());
+						Column temp = new Column(temp_tab, colNamesChild.get(ind).getColumnName());
+						tempColumnNames.add(temp);
+
+					}
+				  }
+
+			  }	   
+	      }
+	    }
+	 if(subQuery_alias != null && !subQuery_alias.isEmpty()) //Changes 3/15
+	 { 
+		int size = tempColumnNames.size();
+		for(int i = 0; i < size; i++)
+		{
+
+			//System.out.println("Alias set+"+tempColumnNames.get(i).getTable()+" and subQuery_alias + "+ subQuery_alias);
+			tempColumnNames.get(i).getTable().setAlias(subQuery_alias);
+		}
+	 }
+	 colNamesParent.clear();
+	 colNamesParent.addAll(tempColumnNames);
+	 return colNamesParent;
 	}
 
 	@Override
@@ -112,23 +193,28 @@ public class Projection2 extends RelationalAlgebra2{
 			}
 			else if(i instanceof AllColumns )
 			{
+				//	 System.out.println("saalc");
 				tempTuple.addAll(t.tuple);
 				tempColumnNames.addAll(colNamesChild);
 			}
 			else if (i instanceof AllTableColumns)
 			{
+				//	 System.out.println("alltabc");
 				AllTableColumns tab = (AllTableColumns) i;
 				Table tab_name = tab.getTable();
 				int numCols = colNamesChild.size();
 				for(int ind = 0; ind < numCols; ind++)
 				{
 
+					// System.out.println("inside for");
 					if(colNamesChild.get(ind).getTable().getAlias() != null)
 					{
+						// System.out.println("pehif+ pec : "+tab_name.getName()+" and tabname +"+ t.colNames.get(ind).getTable().getName()+" and ali+"+t.colNames.get(ind).getTable().getAlias());
 
 						if((colNamesChild.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (colNamesChild.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
 						{
 
+							// System.out.println("beef");
 							PrimitiveValue type = eval.eval(colNamesChild.get(ind));
 							tempTuple.add(type);
 							Table temp_tab = new Table(colNamesChild.get(ind).getTable().getName());
@@ -151,6 +237,7 @@ public class Projection2 extends RelationalAlgebra2{
 			for(int i = 0; i < size; i++)
 			{
 
+				//System.out.println("Alias set+"+tempColumnNames.get(i).getTable()+" and subQuery_alias + "+ subQuery_alias);
 				tempColumnNames.get(i).getTable().setAlias(subQuery_alias);
 			}
 		}
