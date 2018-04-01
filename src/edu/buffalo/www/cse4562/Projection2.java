@@ -19,7 +19,7 @@ public class Projection2 extends RelationalAlgebra2{
 
 	public List<SelectItem> projection;
 	public String subQuery_alias="";
-	
+
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
@@ -30,24 +30,93 @@ public class Projection2 extends RelationalAlgebra2{
 	List<Column> open() throws IOException {
 		colNamesChild = leftChild.open();
 		colNamesParent.addAll(colNamesChild);
+		List<Column> tempColumnNames = new ArrayList<Column>();
+		colNamesChild = leftChild.open();
+		colNamesParent.addAll(colNamesChild);
+		int ps= projection.size();	
+		for(int j=0;j<ps;j++)
+		{	
+			SelectItem i = projection.get(j);
+			if(i instanceof SelectExpressionItem)
+			{
+				SelectExpressionItem k = (SelectExpressionItem)i;
+				String alias = k.getAlias();
+				Expression expr = k.getExpression();
+				if(alias != null)
+				{
+					Column col = new Column();
+					col.setColumnName(alias);
+					Table tab_temp = new Table();
+					col.setTable(tab_temp);
+					tempColumnNames.add((Column)col);
+				}
+				else
+				{
+					tempColumnNames.add((Column)expr);
+				}
+				int lop = 2;
+			}
+			else if(i instanceof AllColumns )
+			{
+				tempColumnNames.addAll(colNamesChild);
+			}
+			else if (i instanceof AllTableColumns)
+			{
+				AllTableColumns tab = (AllTableColumns) i;
+				Table tab_name = tab.getTable();
+				int numCols = colNamesChild.size();
+				for(int ind = 0; ind < numCols; ind++)
+				{
+
+					if(colNamesChild.get(ind).getTable().getAlias() != null)
+					{
+
+						if((colNamesChild.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (colNamesChild.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
+						{
+
+							Table temp_tab = new Table(colNamesChild.get(ind).getTable().getName());
+							temp_tab.setAlias(colNamesChild.get(ind).getTable().getAlias());
+							Column temp = new Column(temp_tab, colNamesChild.get(ind).getColumnName());
+							tempColumnNames.add(temp);
+
+						}
+					}
+
+				}	   
+			}
+		}
+		if(subQuery_alias != null && !subQuery_alias.isEmpty()) //Changes 3/15
+		{ 
+			int size = tempColumnNames.size();
+			for(int i = 0; i < size; i++)
+			{
+
+				tempColumnNames.get(i).getTable().setAlias(subQuery_alias);
+			}
+		}
+		colNamesParent.clear();
+		colNamesParent.addAll(tempColumnNames);
 		return colNamesParent;
 	}
 
 	@Override
 	void close() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	Tuple retNext() throws SQLException {
 		int ps= projection.size();
 		Tuple t = leftChild.retNext();
+		if(t == null)
+		{
+			return null;
+		}
 		int ts = colNamesChild.size();
 		Tuple X;
 		X = t;
 		List<String> sl = new ArrayList<String>();
-		//List<Integer> il = new ArrayList<Integer>();
 		List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 		List<Column> tempColumnNames = new ArrayList<Column>();
 		for(int j=0;j<ts;j++)
@@ -85,19 +154,16 @@ public class Projection2 extends RelationalAlgebra2{
 			SelectItem i = projection.get(j);
 			if(i instanceof SelectExpressionItem)
 			{
-				// System.out.println("selexpr");
 				SelectExpressionItem k = (SelectExpressionItem)i;
 				String alias = k.getAlias();
 
 				Expression expr = k.getExpression();
-				// System.out.println("sel :"+expr);
 				PrimitiveValue type = eval.eval(expr);
 
 				tempTuple.add(type);
 				if(alias != null)
 				{
-					//need to modify schema;
-					//int test = 0;
+
 					Column col = new Column();
 					col.setColumnName(alias);
 					Table tab_temp = new Table();
@@ -162,6 +228,6 @@ public class Projection2 extends RelationalAlgebra2{
 
 		return t;
 	}
-	
+
 
 }

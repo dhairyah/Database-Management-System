@@ -28,6 +28,10 @@ public class Selection2 extends RelationalAlgebra2{
 	@Override
 	Tuple retNext() throws SQLException {
 		Tuple tupleobj = leftChild.retNext();
+		if(tupleobj == null)
+		{
+			return null;
+		}
 
 		Eval eval = new Eval() {
 			@Override
