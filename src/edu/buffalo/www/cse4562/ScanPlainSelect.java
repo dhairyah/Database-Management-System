@@ -33,7 +33,7 @@ public class ScanPlainSelect  extends Tuple implements RelationalAlgebra
    public void open() throws IOException
    {
 	   
-	   treebounds = Main.createTree(this.query, this.subSelctAlias);
+	  // treebounds = Main.createTree(this.query, this.subSelctAlias);
    }
 
    

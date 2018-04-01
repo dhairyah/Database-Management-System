@@ -128,479 +128,133 @@ public class Main {
 	static int c=0;
 	static int f=0;
 	
-	private static void ParseTree(RelTreeObj leafnode) throws IOException, SQLException
+	private static void ParseTree(RelationalAlgebra2 root) throws IOException, SQLException
 	{		
-		//c=0;
-		//System.out.println("tc:"+c+" tl:"+l);
-		if(leafnode.getOperator() instanceof Scan)
+		Tuple tupleobj;
+		root.open();
+		if(!(root instanceof OrderBy2))
 		{
-			Scan table = (Scan)leafnode.getOperator();
-			table.open();
-			Tuple tupleobj = new Tuple();
-			RelTreeObj parentnode = null;
-			OrderBy orderby = new OrderBy();
-			int printflag = 1;
-			int blockOperator = 0;
-			
-			while(table.hasNext())
+			tupleobj = root.retNext();
+			while(tupleobj != null)
 			{
-				if(c==l && f==0)
+				
+				if(c==l)
 				{
-					//System.out.println("ccc:"+c+" ll:"+l);
 					break;
 				}
-				tupleobj = table.retNext();
-				parentnode = leafnode.retParent();
-				printflag = 1;
-				
-				
-				while(parentnode != null)
+				for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
 				{
-					
-					if(parentnode.operator.api(tupleobj)==true)
-					{
-				     
-					 if(parentnode.getOperator() instanceof OrderBy)
-					 {
-						 blockOperator = 1;
-						 f=1;
-						 //System.out.println("block");
-						 orderby = (OrderBy)parentnode.getOperator();
-					 }
-					 parentnode = parentnode.retParent();
-					 
-					}
-					else
-					{
-						//System.out.println("break");
-						printflag = 0;
-						break;
-					}
+					System.out.print(tupleobj.tuple.get(i) + "|");
 				}
+				System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+				c++;
 				
-				if(printflag == 1 && blockOperator == 0)
-				{
-					for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
-					{
-						System.out.print(tupleobj.tuple.get(i) + "|");
-					}
-					///System.out.println("not_going");
-					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-					c++;
-				}
-				//System.out.println("Incrementing");
-				//c++;
-				
+				tupleobj = root.retNext();
 			}
 			
-			if(blockOperator==1)
-			{
-				//System.out.println("ddddd");
-				orderby.sortAndPrint(l);
-			}
-		}
-		else
-		{
-			Join join = (Join)leafnode.getOperator();
-			Tuple tupleobj = new Tuple();
-			RelTreeObj parentnode = null;
-			int printflag = 1;
-			OrderBy orderby = new OrderBy();
-			int blockOperator = 0;
-			
-			while(join.api(tupleobj))
-			{
-				parentnode = leafnode.retParent();
-				printflag = 1;
-				//System.out.println("c:"+c+" l:"+l);
-				if(c==l && f==0)
-				{
-					//System.out.println("bbreakk");
-					break;
-				}
-				
-				//added join 3 table join
-				if(parentnode.getOperator() instanceof Join)
-				{
-					//System.out.println("ii");
-					Join innode  = (Join)parentnode.getOperator();
-					innode.current_left_tuple = tupleobj;
-					
-					parentnode.operator = (RelationalAlgebra)innode;
-					
-					//System.out.println("rec pasre tree start");
-					ParseTree(parentnode);
-					//System.out.println("rec pasre tree end");
-					
-					continue;
-				}
-				
-				while(parentnode != null)
-				{
-					
-					if(parentnode.operator.api(tupleobj)==true)
-					{
-						if(parentnode.getOperator() instanceof OrderBy)
-						 {
-							 blockOperator = 1;
-							 f=1;
-							 orderby = (OrderBy)parentnode.getOperator();
-						 }
-						 parentnode = parentnode.retParent();
-					}
-					else
-					{
-						printflag = 0;
-						//System.out.println("tgee");
-						break;
-					}
-				}
-				
-				if(printflag == 1 && blockOperator == 0)
-				{
-					for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
-					{
-						System.out.print(tupleobj.tuple.get(i) + "|");
-					}
-					System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-					c++;
-				}
-			//System.out.println("incrementing");	
-			//c++;	
-			}
-			
-			if(blockOperator==1)
-			{
-				//System.out.println("goiing");
-				orderby.sortAndPrint(l);
-			}
 		}
 	}
 	
 	
 	
-	public static RelTreeObj[] createTree(PlainSelect query, String alias) {
-		RelTreeObj parent = null;
-		RelTreeObj leaf = null;
-		RelTreeObj[] treebounds = new RelTreeObj[2];
+	public static RelationalAlgebra2 createTree(PlainSelect query, String alias) {
 		int rootCreated = 0;
+		RelationalAlgebra2 root=null;
+		RelationalAlgebra2 parent=null;
 		
 		List<OrderByElement> orderbyEl = query.getOrderByElements();
 		if(orderbyEl != null) {
-			RelationalAlgebra op = new OrderBy();
-			OrderBy op1= (OrderBy)op;
+			RelationalAlgebra2 op = new OrderBy2();
+			OrderBy2 op1= (OrderBy2)op;
 			op1.element = orderbyEl;
-			op1.subQuery_alias = alias;
-			op= (RelationalAlgebra)op1 ;
-			RelTreeObj child = new RelTreeObj(op);
-			treebounds[0] = child;
+			op= (RelationalAlgebra2)op1 ;
+			op.parent = null;
+			op.leftChild = null;
+			op.rightChild = null;
+			root = op;
+			parent = op;
 			rootCreated = 1;
-			parent = child;
 		}
 		
 		List<SelectItem> selItem = query.getSelectItems();
 		if(!selItem.isEmpty()) {
-			RelationalAlgebra op = new Projection();
-			Projection op1= (Projection)op;
+			RelationalAlgebra2 op = new Projection2();
+			Projection2 op1= (Projection2)op;
 			op1.projection = selItem;
+			op= (RelationalAlgebra2)op1 ;
 			if(rootCreated == 0)
 			{
-				op1.subQuery_alias = alias;
-			}
-			op= (RelationalAlgebra)op1 ;
-			RelTreeObj child = new RelTreeObj(op);
-			if(rootCreated == 0)
-			{
-				treebounds[0] = child;
+				op.parent = null;
+				root = op;
 			}
 			else
 			{
-				parent.attachChild(child);
+				op.parent = parent;
+				
 			}
-			parent = child;
+			
+			op.leftChild= null;
+			op.rightChild = null;
+			parent = op;
 		}
 		Expression exp = query.getWhere();
 		if(exp != null) {
-			RelationalAlgebra op = new Selection();
-			Selection op1 = (Selection)op;
+			RelationalAlgebra2 op = new Selection2();
+			Selection2 op1 = (Selection2)op;
 			op1.expression = exp;
-			op = (RelationalAlgebra)op1;
-			RelTreeObj child = new RelTreeObj(op);
-			parent.attachChild(child);
-			parent = child;
+			op = (RelationalAlgebra2)op1;
+			op.parent = parent;
+			op.leftChild = null;
+			op.rightChild = null;
+			parent.leftChild = op;
+			parent = op;
+			
 		}
 		FromItem from = query.getFromItem();
 		if(from != null) {
-			//System.out.println("xx:"+query.getJoins());
 			
 			if(query.getJoins()!=null)
 			{
-				int nux=query.getJoins().size();
-				/*if(query.getJoins().size()==1)
-				{
-					RelationalAlgebra op = new Join();
-					Join op1 = (Join)op;
-					
-					Scan node1 = new Scan();
-					Scan node2 = new Scan();
-					node1.fromitem = from;
-					node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
-					if(!alias.isEmpty())
-					{
-						//Added to handle alias in subquery select rr.* from (select * from R) rr;
-						node1.fromitem.setAlias(alias);
-						node2.fromitem.setAlias(alias);
-					}
-					
-					try {
-						node1.open();
-						node2.open();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					op1.node1 = node1;
-					op1.node2 = node2;
-					op = (RelationalAlgebra)op1;
-					RelTreeObj child = new RelTreeObj(op);
-					parent.attachChild(child);
-					parent = child;
-					leaf = child;
-				}*/
-				//else
-				{
-					while(nux>1)
-					{	
-					 RelationalAlgebra opp = new Join();
-					 Join op11 = (Join)opp;
-					
-					 Join node11 = new Join();
-					 node11 = op11;
-					 if(query.getJoins().get(nux-1).getRightItem() instanceof SubSelect)
-					 {
-						ScanPlainSelect plainSelectnode= new ScanPlainSelect(); 
-						plainSelectnode.query = (PlainSelect) ((SubSelect) query.getJoins().get(nux-1).getRightItem()).getSelectBody();
-						plainSelectnode.subSelctAlias = query.getJoins().get(nux-1).getRightItem().getAlias();
-						
-						try {
 
-										plainSelectnode.open();
-									   } catch (IOException e) {
-										// TODO Auto-generated catch block
-										 e.printStackTrace();
-									   }
-						
-						  op11.node1 = node11;
-						  op11.node2 = plainSelectnode;	
-					 }
-					 else
-					 {
-						 Scan node22 = new Scan();					 
-						 node22.fromitem = (FromItem) query.getJoins().get(nux-1).getRightItem();
-						 node22.fromitem.setAlias(query.getJoins().get(nux-1).getRightItem().getAlias());
-						 
-						 
-						 
-						// System.out.println("xxmain:"+node22.fromitem);
-						 if(query.getJoins().get(nux-1).getRightItem().getAlias() != null && !query.getJoins().get(nux-1).getRightItem().getAlias().isEmpty() )
-						 {
-							//Added to handle alias in subquery select rr.* from (select * from R) rr;
-							//node1.fromitem.setAlias(alias);
-							node22.fromitem.setAlias(query.getJoins().get(nux-1).getRightItem().getAlias());
-						 } 
-						
-						 try {
-				//			node1.open();
-							node22.open();
-						   } catch (IOException e) {
-							// TODO Auto-generated catch block
-							 e.printStackTrace();
-						   }
-						
-						  op11.node1 = node11;
-						  op11.node2 = node22;
-					 }
-					 
-					
-					
-			
-  					  opp = (RelationalAlgebra)op11;
-					  RelTreeObj childd = new RelTreeObj(opp);
-					  parent.attachChild(childd);
-					  parent = childd;
-					  leaf = childd;
-					
-					  nux--;
-					}  
-					///////////////////////////////
-					
-					RelationalAlgebra op = new Join();
-					Join op1 = (Join)op;
-					
-					if(from instanceof SubSelect)
-					{
-						ScanPlainSelect node1 = new ScanPlainSelect();
-						node1.query = (PlainSelect) ((SubSelect) from).getSelectBody();
-						if((alias != null && !alias.isEmpty()) || !query.getFromItem().getAlias().isEmpty())
-						{
-							//Added to handle alias in subquery select rr.* from (select * from R) rr;
-							node1.subSelctAlias = query.getFromItem().getAlias();
-							
-						}
-						try {
-							node1.open();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						op1.node1 = node1;
-					}
-					else
-					{
-						Scan node1 = new Scan();
-						node1.fromitem = from;
-						if((alias != null && !alias.isEmpty()) || !query.getFromItem().getAlias().isEmpty())
-						{
-							//Added to handle alias in subquery select rr.* from (select * from R) rr;
-							node1.fromitem.setAlias(query.getFromItem().getAlias());
-							
-						}
-						try {
-							node1.open();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						if(query.getJoins().size() == 1 && ((Table) query.getFromItem()).getName().equals(((Table) query.getJoins().get(0).getRightItem()).getName()))
-						{
-							node1.expression = exp;
-							node1.testing = true;
-						}
-						op1.node1 = node1;
-					}
-					
-					if(query.getJoins().get(0).getRightItem() instanceof SubSelect)
-					{
-						ScanPlainSelect node2 = new ScanPlainSelect();
-						node2.query = (PlainSelect)from;
-						if(query.getJoins().get(0).getRightItem().getAlias()!=null && !query.getJoins().get(0).getRightItem().getAlias().isEmpty())
-						{
-							//Added to handle alias in subquery select rr.* from (select * from R) rr;
-							node2.subSelctAlias = query.getJoins().get(0).getRightItem().getAlias();
-							
-						}
-						try {
-							node2.open();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						op1.node2 = node2;
-					}
-					else
-					{
-						Scan node2 = new Scan();
-						node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
-						if(query.getJoins().get(0).getRightItem().getAlias()!=null && !query.getJoins().get(0).getRightItem().getAlias().isEmpty())
-						{
-							node2.fromitem.setAlias(query.getJoins().get(0).getRightItem().getAlias());
-						}
-						
-						try {
-							node2.open();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						if(query.getJoins().size() == 1 && ((Table) query.getFromItem()).getName().equals(((Table) query.getJoins().get(0).getRightItem()).getName()))
-						{
-							node2.expression = exp;
-							node2.testing = true;
-						}
-						op1.node2 = node2;
-					}
-					
-					
-					/*Scan node1 = new Scan();
-					Scan node2 = new Scan();
-					node1.fromitem = from;
-					node2.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
-					if(alias != null && !alias.isEmpty())
-					{
-						//Added to handle alias in subquery select rr.* from (select * from R) rr;
-						node1.fromitem.setAlias(query.getFromItem().getAlias());
-						
-					}
-					if(query.getJoins().get(0).getRightItem().getAlias()!=null && !query.getJoins().get(0).getRightItem().getAlias().isEmpty())
-					{
-						node2.fromitem.setAlias(query.getJoins().get(0).getRightItem().getAlias());
-					}*/
-					
-					
-					
-					
-					op = (RelationalAlgebra)op1;
-					RelTreeObj child = new RelTreeObj(op);
-					parent.attachChild(child);
-					parent = child;
-					leaf = child;
-					
-					////////////////////////////////////////////
-				}
-				
+				//not implemented right now
 			}
 			else
 			{
-				RelationalAlgebra op = new Scan();
-				Scan op1 = (Scan)op;
+				RelationalAlgebra2 op = new Scan2();
+				Scan2 op1 = (Scan2)op;
 				
 				
 				if(from instanceof SubSelect)
 				{
 					
-					RelTreeObj[] subtreebounds = new RelTreeObj[2];
-					subtreebounds = createTree((PlainSelect) ((SubSelect) from).getSelectBody(), ((SubSelect) from).getAlias());
-					parent.attachChild(subtreebounds[0]);
-					parent = subtreebounds[0];
-					leaf = subtreebounds[1];
-					
+					RelationalAlgebra2 subTreeRoot = null;;
+					subTreeRoot = createTree((PlainSelect) ((SubSelect) from).getSelectBody(), ((SubSelect) from).getAlias());
+					parent.leftChild = subTreeRoot;	
 				}			
 				else
 				{			
 						
 					op1.fromitem = from;
-					if(alias != null && !alias.isEmpty()) ///Changes 3/15 ///////////////////
-					{
-						//System.out.println("li:"+alias);
-						//Added to handle alias in subquery select rr.* from (select * from R) rr;
-						op1.fromitem.setAlias(alias);
-					}
-					op = (RelationalAlgebra)op1;
-					RelTreeObj child = new RelTreeObj(op);
-					parent.attachChild(child);
-					parent = child;
-					leaf = child;
+					op = (RelationalAlgebra2)op1;
+					op.parent = parent;
+					op.leftChild = null;
+					op.rightChild = null;
+					parent.leftChild = op;
+					parent = op;
 				}
 			}
 		}
 		
-		treebounds[1] = leaf;
-		return treebounds;
+		return root;
 	}
 	private static void test() throws IOException, SQLException
 	{
 		Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
 	}
 	public static void main(String[] args) throws ParseException, SQLException {
-		//System.out.println("Hello, World");
 		
-		RelTreeObj[] treebounds = new RelTreeObj[2];
-		RelTreeObj leaf = null;
-		String prompt = "$> ";
-		
-		//int exc = 5/0;
-		
+		RelationalAlgebra2 treeRoot = null;
+		String prompt = "$> ";		
 		System.out.println(prompt);
         System.out.flush();
 
@@ -624,14 +278,12 @@ public class Main {
 					PlainSelect plain = (PlainSelect)body;
 					if (plain.getLimit()!=null)
 					{	l=(int)plain.getLimit().getRowCount();
-					//System.out.println("limitL:"+l);
 					}
-				     //System.out.println("alias:"+plain.getFromItem().getAlias());
-					treebounds = createTree(plain,"");
+					treeRoot = createTree(plain,"");
 					
 					try 
 					{
-						ParseTree(treebounds[1]);
+						ParseTree(treeRoot);
 					} 
 					catch (IOException e) 
 					{
@@ -644,20 +296,10 @@ public class Main {
 				int i = 0;
 			}
 			else if(statement instanceof CreateTable) {
-				//create = (CreateTable)statement;
 				CreateTable create1 = (CreateTable) statement;
 				int k = 0;
 				String tableName = create1.getTable().getName().toLowerCase() ;
-				System.out.println("S:"+create1.getColumnDefinitions());
 				map.put(tableName, create1);
-				/*try {
-					test();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-
-				}
-				System.exit(0);*/
 			}
 			System.out.println(prompt);
             System.out.flush();
