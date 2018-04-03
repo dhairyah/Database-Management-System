@@ -219,7 +219,22 @@ public class Main {
 			if(query.getJoins()!=null)
 			{
 
-				//not implemented right now
+				RelationalAlgebra2 op = new Join2();
+				Join2 op1 = (Join2)op;
+				
+				Scan2 leftChild = new Scan2();
+				Scan2 rightChild = new Scan2();
+				
+				leftChild.fromitem = from;
+				rightChild.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
+				
+				op1.leftChild = leftChild;
+				op1.rightChild = rightChild;
+				
+				op = (RelationalAlgebra2)op1;
+				parent.leftChild = op;
+				parent = op;
+				
 			}
 			else
 			{
