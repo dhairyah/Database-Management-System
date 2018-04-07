@@ -21,6 +21,8 @@ public abstract class RelationalAlgebra2
    abstract List<Column> open() throws IOException;
    abstract void close();
    abstract Tuple retNext() throws SQLException;
+   abstract boolean hasNext() throws SQLException;
+   abstract void reset();
    
    RelationalAlgebra2()
    {

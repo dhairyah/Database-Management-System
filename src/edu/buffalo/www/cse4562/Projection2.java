@@ -212,5 +212,16 @@ public class Projection2 extends RelationalAlgebra2{
 		return t;
 	}
 
+	@Override
+	boolean hasNext() throws SQLException {
+		return leftChild.hasNext();
+	}
+	
+	@Override
+	void reset() {
+		leftChild.reset();
+		
+	}
+
 
 }

@@ -79,5 +79,16 @@ public class Selection2 extends RelationalAlgebra2{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	boolean hasNext() throws SQLException {
+		return leftChild.hasNext();
+	}
+	
+	@Override
+	void reset() {
+		leftChild.reset();
+		
+	}
 
 }

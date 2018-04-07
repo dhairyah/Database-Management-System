@@ -80,10 +80,20 @@ public class Scan2 extends RelationalAlgebra2 {
 		
 	}
 
-	public void reset() throws IOException
+	public void reset()
 	{
-		reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
-		parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
+		try {
+			reader = Files.newBufferedReader(Paths.get("src//"+tablename+".csv"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		tupplelist = parser.iterator(); 
 		isOpen = false;
 	}
