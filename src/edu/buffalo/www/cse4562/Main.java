@@ -219,8 +219,9 @@ public class Main {
 			if(query.getJoins()!=null)
 			{
 
+int joinCnt=query.getJoins().size();
+				
 				RelationalAlgebra2 op = new Join2();
-				Join2 op1 = (Join2)op;
 				
 				Scan2 leftChild = new Scan2();
 				Scan2 rightChild = new Scan2();
@@ -228,10 +229,25 @@ public class Main {
 				leftChild.fromitem = from;
 				rightChild.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
 				
-				op1.leftChild = leftChild;
-				op1.rightChild = rightChild;
+				op.leftChild = leftChild;
+				op.rightChild = rightChild;
 				
-				op = (RelationalAlgebra2)op1;
+				for(int i=1;i<joinCnt;i++)
+				{
+					
+					RelationalAlgebra2 opp = new Join2();
+					
+					Scan2 right = new Scan2();	
+					right.fromitem = (FromItem) query.getJoins().get(i).getRightItem();
+					
+					opp.leftChild = op;
+					opp.rightChild = right;
+					
+					op.parent = opp;
+					op = opp;
+					
+				}
+				
 				parent.leftChild = op;
 				parent = op;
 				
