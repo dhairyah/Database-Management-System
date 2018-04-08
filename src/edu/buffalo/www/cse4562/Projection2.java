@@ -54,7 +54,7 @@ public class Projection2 extends RelationalAlgebra2{
 					col.setTable(tab_temp);
 					tempColumnNames.add((Column)col);
 				}
-				else
+				else 
 				{
 					tempColumnNames.add((Column)expr);
 				}
