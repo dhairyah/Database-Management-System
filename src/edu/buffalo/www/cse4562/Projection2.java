@@ -1,4 +1,4 @@
-package edu.buffalo.www.cse4562;
+	package edu.buffalo.www.cse4562;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -56,7 +56,19 @@ public class Projection2 extends RelationalAlgebra2{
 				}
 				else 
 				{
-					tempColumnNames.add((Column)expr);
+					if(expr instanceof Column)
+					{
+						tempColumnNames.add((Column)expr);
+					}
+					else
+					{
+						Column col = new Column();
+						col.setColumnName(expr.toString());
+						Table tab_temp = new Table();
+						col.setTable(tab_temp);
+						tempColumnNames.add((Column)col);
+					}
+					
 				}
 				int lop = 2;
 			}

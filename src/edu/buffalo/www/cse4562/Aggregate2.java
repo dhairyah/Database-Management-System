@@ -6,7 +6,7 @@ import java.util.List;
 
 import net.sf.jsqlparser.schema.Column;
 
-public class GroupBy2 extends RelationalAlgebra2 {
+public class Aggregate2 extends RelationalAlgebra2 {
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {

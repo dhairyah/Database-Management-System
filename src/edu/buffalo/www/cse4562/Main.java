@@ -219,7 +219,7 @@ public class Main {
 			if(query.getJoins()!=null)
 			{
 
-int joinCnt=query.getJoins().size();
+				int joinCnt=query.getJoins().size();
 				
 				RelationalAlgebra2 op = new Join2();
 				
