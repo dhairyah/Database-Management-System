@@ -131,10 +131,13 @@ public class Main {
 	private static void ParseTree(RelationalAlgebra2 root) throws IOException, SQLException
 	{		
 		Tuple tupleobj;
+		//System.out.println("R:"+root.getClass());
 		root.open();
+		OrderBy2 od;//= new OrderBy2();
 		if(!(root instanceof OrderBy2))
 		{
 			tupleobj = root.retNext();
+			//System.out.println("Type:"+tupleobj.record);
 			while(tupleobj != null)
 			{
 				
@@ -148,10 +151,34 @@ public class Main {
 				}
 				System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				c++;
-				
+				System.out.println("Completed");
 				tupleobj = root.retNext();
 			}
 			
+		}
+		else
+		{
+			tupleobj = root.retNext();
+			//System.out.println("Type:"+tupleobj.record);
+			while(tupleobj != null)
+			{
+				
+				//if(c==l)
+				//{
+					//break;
+				//}
+				//for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+				//{
+					//System.out.print(tupleobj.tuple.get(i) + "|");
+				//}
+				//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+				//c++;
+				//System.out.println("Completed");
+				tupleobj = root.retNext();
+			}
+			od=(OrderBy2)root;
+			od.sortAndPrint(l);
+			//System.out.println("c:"+root.getClass());
 		}
 	}
 	
@@ -163,6 +190,7 @@ public class Main {
 		RelationalAlgebra2 parent=null;
 		
 		List<OrderByElement> orderbyEl = query.getOrderByElements();
+		//System.out.println("ELementtt:"+orderbyEl.get(0));
 		if(orderbyEl != null) {
 			RelationalAlgebra2 op = new OrderBy2();
 			OrderBy2 op1= (OrderBy2)op;
@@ -193,7 +221,7 @@ public class Main {
 			{
 				op= (RelationalAlgebra2)op1;
 				op.parent = parent;
-				
+				parent.leftChild = op;
 			}
 			
 			op.leftChild= null;
@@ -219,9 +247,8 @@ public class Main {
 			if(query.getJoins()!=null)
 			{
 
-				int joinCnt=query.getJoins().size();
-				
 				RelationalAlgebra2 op = new Join2();
+				Join2 op1 = (Join2)op;
 				
 				Scan2 leftChild = new Scan2();
 				Scan2 rightChild = new Scan2();
@@ -229,25 +256,10 @@ public class Main {
 				leftChild.fromitem = from;
 				rightChild.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
 				
-				op.leftChild = leftChild;
-				op.rightChild = rightChild;
+				op1.leftChild = leftChild;
+				op1.rightChild = rightChild;
 				
-				for(int i=1;i<joinCnt;i++)
-				{
-					
-					RelationalAlgebra2 opp = new Join2();
-					
-					Scan2 right = new Scan2();	
-					right.fromitem = (FromItem) query.getJoins().get(i).getRightItem();
-					
-					opp.leftChild = op;
-					opp.rightChild = right;
-					
-					op.parent = opp;
-					op = opp;
-					
-				}
-				
+				op = (RelationalAlgebra2)op1;
 				parent.leftChild = op;
 				parent = op;
 				
