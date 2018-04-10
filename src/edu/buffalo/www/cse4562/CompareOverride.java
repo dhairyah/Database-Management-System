@@ -216,4 +216,4 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 				}
 			}
 	}
-}
+ }
