@@ -100,5 +100,17 @@ public class OrderBy2 extends RelationalAlgebra2
 		 }
 	}
 
+	@Override
+	boolean hasNext() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
  	 
 }
