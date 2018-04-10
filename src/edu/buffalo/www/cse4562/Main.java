@@ -89,10 +89,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -103,20 +106,25 @@ import net.sf.jsqlparser.expression.BooleanValue;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.select.AllColumns;
+import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
  
@@ -131,13 +139,10 @@ public class Main {
 	private static void ParseTree(RelationalAlgebra2 root) throws IOException, SQLException
 	{		
 		Tuple tupleobj;
-		//System.out.println("R:"+root.getClass());
 		root.open();
-		OrderBy2 od;//= new OrderBy2();
 		if(!(root instanceof OrderBy2))
 		{
 			tupleobj = root.retNext();
-			//System.out.println("Type:"+tupleobj.record);
 			while(tupleobj != null)
 			{
 				
@@ -151,34 +156,10 @@ public class Main {
 				}
 				System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				c++;
-				System.out.println("Completed");
+				
 				tupleobj = root.retNext();
 			}
 			
-		}
-		else
-		{
-			tupleobj = root.retNext();
-			//System.out.println("Type:"+tupleobj.record);
-			while(tupleobj != null)
-			{
-				
-				//if(c==l)
-				//{
-					//break;
-				//}
-				//for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
-				//{
-					//System.out.print(tupleobj.tuple.get(i) + "|");
-				//}
-				//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
-				//c++;
-				//System.out.println("Completed");
-				tupleobj = root.retNext();
-			}
-			od=(OrderBy2)root;
-			od.sortAndPrint(l);
-			//System.out.println("c:"+root.getClass());
 		}
 	}
 	
@@ -190,7 +171,6 @@ public class Main {
 		RelationalAlgebra2 parent=null;
 		
 		List<OrderByElement> orderbyEl = query.getOrderByElements();
-		//System.out.println("ELementtt:"+orderbyEl.get(0));
 		if(orderbyEl != null) {
 			RelationalAlgebra2 op = new OrderBy2();
 			OrderBy2 op1= (OrderBy2)op;
@@ -204,29 +184,154 @@ public class Main {
 			rootCreated = 1;
 		}
 		
-		List<SelectItem> selItem = query.getSelectItems();
-		if(!selItem.isEmpty()) {
-			RelationalAlgebra2 op = new Projection2();
-			Projection2 op1= (Projection2)op;
-			op1.projection = selItem;
+		int aggr = 0; 
+		List<Function> functionList = new ArrayList<Function>();  //list of aggr functions in order
+		List<Integer> functionIndex = new ArrayList<Integer>(); 
+		List<SelectItem> aggrProjection = new ArrayList<SelectItem>(); //SelectItem stmtm without functions to be passed to proj below aggr 
+		String projSelectStmt = "";
+		List<Column> parentProj = new ArrayList<Column>(); //list of columns with aliases after applying aggr to be passed above
+		
+		Iterator<SelectItem> columnName =  query.getSelectItems().iterator();
+		int index=0;
+		while(columnName.hasNext())
+		{
 			
+			SelectItem currSelectItem = columnName.next();
+			
+			if(currSelectItem instanceof AllColumns || currSelectItem instanceof AllTableColumns)
+			{
+				break;
+			}
+			else
+			{
+				SelectExpressionItem currSelectExpression = ((SelectExpressionItem) currSelectItem);
+				Expression currItem = currSelectExpression.getExpression();
+				if(currItem instanceof Function)
+				{
+					
+					functionList.add(((Function) currItem));
+					functionIndex.add(index);
+					if(projSelectStmt.equals(""))
+					{
+						projSelectStmt = projSelectStmt + (((Function) currItem).getParameters().getExpressions().get(0).toString());
+					}
+					else
+					{
+						projSelectStmt = projSelectStmt + ","+((Function) currItem).getParameters().getExpressions().get(0).toString();
+					}
+					
+					aggr=1;
+				}
+				else
+				{
+					if(projSelectStmt.equals(""))
+					{
+						projSelectStmt = projSelectStmt + currSelectItem.toString();
+					}
+					else
+					{
+						projSelectStmt = projSelectStmt + ","+currSelectItem.toString();
+					}
+				}
+				
+				
+				Column col = new Column();
+				String als = currSelectExpression.getAlias();
+				Table tab_temp = new Table();
+				if(als!=null)
+				{
+					col.setColumnName(als);
+				}
+				else
+				{
+					col.setColumnName(currSelectExpression.toString());
+				}
+				
+				col.setTable(tab_temp);
+				parentProj.add((Column)col);
+			}
+			
+			index++;
+			
+		}
+		
+		
+		if(aggr==1)
+		{
+			Reader input = new StringReader("select "+projSelectStmt+" from xyz");
+			CCJSqlParser parser = new CCJSqlParser(input);
+			Statement statement = null;
+			try {
+				statement = parser.Statement();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			aggrProjection =  ((PlainSelect) ((Select) statement).getSelectBody()).getSelectItems();
+			
+			RelationalAlgebra2 op = new Aggregate2();
+			Aggregate2 op1 = (Aggregate2)op;
+			op1.groupByColumns = query.getGroupByColumnReferences();
+			op1.aggrFunctions.addAll(functionList);
+			op1.colNamesParent.addAll(parentProj);
+			op1.functionIndex.addAll(functionIndex);
+			op= (RelationalAlgebra2)op1 ;
 			if(rootCreated == 0)
 			{
-				op1.subQuery_alias = alias;
-				op= (RelationalAlgebra2)op1;
 				op.parent = null;
 				root = op;
 			}
 			else
 			{
-				op= (RelationalAlgebra2)op1;
 				op.parent = parent;
-				parent.leftChild = op;
 			}
 			
 			op.leftChild= null;
 			op.rightChild = null;
 			parent = op;
+			
+			RelationalAlgebra2 opproj = new Projection2();
+			Projection2 opproj1 = (Projection2)opproj;
+			
+			opproj1.projection = aggrProjection;
+			opproj= (RelationalAlgebra2)opproj1;
+			opproj.parent = parent;
+			opproj.leftChild= null;
+			opproj.rightChild = null;
+			parent.leftChild = opproj;
+			parent = opproj;
+			
+		}
+		else
+		{	
+			List<SelectItem> selItem = query.getSelectItems();
+			if(!selItem.isEmpty()) {
+				RelationalAlgebra2 op = new Projection2();
+				Projection2 op1= (Projection2)op;
+				op1.projection = selItem;
+				
+				if(rootCreated == 0)
+				{
+					op1.subQuery_alias = alias;
+					op= (RelationalAlgebra2)op1;
+					op.parent = null;
+					op.leftChild= null;
+					op.rightChild = null;
+					root = op;
+				}
+				else
+				{
+					op= (RelationalAlgebra2)op1;
+					op.leftChild= null;
+					op.rightChild = null;
+					op.parent = parent;
+					parent.leftChild = op;
+					
+				}
+				
+				
+				parent = op;
+			}
 		}
 		Expression exp = query.getWhere();
 		if(exp != null) {
@@ -247,8 +352,9 @@ public class Main {
 			if(query.getJoins()!=null)
 			{
 
+				int joinCnt=query.getJoins().size();
+				
 				RelationalAlgebra2 op = new Join2();
-				Join2 op1 = (Join2)op;
 				
 				Scan2 leftChild = new Scan2();
 				Scan2 rightChild = new Scan2();
@@ -256,10 +362,25 @@ public class Main {
 				leftChild.fromitem = from;
 				rightChild.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
 				
-				op1.leftChild = leftChild;
-				op1.rightChild = rightChild;
+				op.leftChild = leftChild;
+				op.rightChild = rightChild;
 				
-				op = (RelationalAlgebra2)op1;
+				for(int i=1;i<joinCnt;i++)
+				{
+					
+					RelationalAlgebra2 opp = new Join2();
+					
+					Scan2 right = new Scan2();	
+					right.fromitem = (FromItem) query.getJoins().get(i).getRightItem();
+					
+					opp.leftChild = op;
+					opp.rightChild = right;
+					
+					op.parent = opp;
+					op = opp;
+					
+				}
+				
 				parent.leftChild = op;
 				parent = op;
 				
