@@ -127,8 +127,7 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
- 
-public class Main {
+ public class Main {
 	
 	//static CreateTable create;
 	static HashMap<String, CreateTable> map = new HashMap<>();
@@ -139,10 +138,13 @@ public class Main {
 	private static void ParseTree(RelationalAlgebra2 root) throws IOException, SQLException
 	{		
 		Tuple tupleobj;
+		//System.out.println("R:"+root.getClass());
 		root.open();
+		OrderBy2 od;//= new OrderBy2();
 		if(!(root instanceof OrderBy2))
 		{
 			tupleobj = root.retNext();
+			//System.out.println("Type:"+tupleobj.record);
 			while(tupleobj != null)
 			{
 				
@@ -156,10 +158,34 @@ public class Main {
 				}
 				System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				c++;
-				
+				System.out.println("Completed");
 				tupleobj = root.retNext();
 			}
 			
+		}
+		else
+		{
+			tupleobj = root.retNext();
+			//System.out.println("Type:"+tupleobj.record);
+			while(tupleobj != null)
+			{
+				
+				//if(c==l)
+				//{
+					//break;
+				//}
+				//for(int i = 0; i < tupleobj.tuple.size() - 1; i++)
+				//{
+					//System.out.print(tupleobj.tuple.get(i) + "|");
+				//}
+				//System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
+				//c++;
+				//System.out.println("Completed");
+				tupleobj = root.retNext();
+			}
+			od=(OrderBy2)root;
+			od.sortAndPrint(l);
+			//System.out.println("c:"+root.getClass());
 		}
 	}
 	
