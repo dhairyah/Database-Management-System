@@ -408,6 +408,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				}
 				
 				parent.leftChild = op;
+				op.parent = parent;
 				parent = op;
 				
 			}
