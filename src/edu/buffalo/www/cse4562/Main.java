@@ -158,7 +158,6 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				}
 				System.out.println(tupleobj.tuple.get(tupleobj.tuple.size() - 1));
 				c++;
-				System.out.println("Completed");
 				tupleobj = root.retNext();
 			}
 			
@@ -309,6 +308,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			}
 			else
 			{
+				parent.leftChild = op;
 				op.parent = parent;
 			}
 			
