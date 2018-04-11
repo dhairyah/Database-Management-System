@@ -63,11 +63,12 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		{
 			if(init==0)
 			{
+				Tuple childTuple = new Tuple();	
 				hashAggr=new HashMap<String, ArrayList<Tuple>>();
-				 while(leftChild.hasNext())
+				 while((childTuple=leftChild.retNext())!=null)
 				 {
 					Tuple retTuple = new Tuple();
-					retTuple.tuple.addAll(leftChild.retNext().tuple);
+					retTuple.tuple.addAll(childTuple.tuple);
 					for(int i=0;i<groupByIndex.size();i++)
 					{
 						groupByColVals = groupByColVals+retTuple.tuple.get(groupByIndex.get(i))+"||";
@@ -125,11 +126,11 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		}
 		else
 		{
-			/*Tuple recTuple = new Tuple();
+		/*	Tuple recTuple = new Tuple();
 			Tuple retTuple = new Tuple();
 			int init =0,aggrIndex;
 			List<Object> aggrValues = new ArrayList<Object>();
-			List<Integer> aggrTypes = new ArrayList<Integer>();
+			List<Integer> aggrTypes = new ArrayList<Integer>(); // 0 for long and 1 for double
 			while(leftChild.hasNext())
 			{
 				recTuple = leftChild.retNext();
@@ -145,11 +146,14 @@ public class Aggregate2 extends RelationalAlgebra2 {
 							if(val instanceof LongValue)
 							{
 								aggrValues.add(retTuple.tuple.get(aggrIndex).toLong());
+								aggrTypes.add(0);
 							}
 							else if(val instanceof DoubleValue)
 							{
 								aggrValues.add(retTuple.tuple.get(aggrIndex).toDouble());
+								aggrTypes.add(1);
 							}
+							init=1;
 							
 						}
 						else
@@ -176,7 +180,8 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				}retTuple.tuple.get(functionIndex.get(i))r
 				
 				
-			}*/
+			}
+			*/
 			return null;
 		}
 	}
