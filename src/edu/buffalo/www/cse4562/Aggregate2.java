@@ -58,7 +58,6 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	Tuple  retNext() throws SQLException {
 		if(this.groupByColumns!=null)
@@ -181,7 +180,20 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				}
 				
 				aggrTupleSent=1;
-				retTuple.tuple.addAll((Collection<? extends PrimitiveValue>) aggrValues);
+			//	retTuple.tuple.addAll((Collection<? extends PrimitiveValue>) aggrValues);
+				PrimitiveValue d;
+				for(int i=0;i<aggrValues.size();i++)
+				{
+					if(aggrTypes.get(i)==0)
+					{
+						d = new LongValue((long) aggrValues.get(i));
+					}
+					else
+					{
+						d = new DoubleValue((double) aggrValues.get(i));
+					}
+					retTuple.tuple.add(d);
+				}
 				
 				
 				return retTuple;
