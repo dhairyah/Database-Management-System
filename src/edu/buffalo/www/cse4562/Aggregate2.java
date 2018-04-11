@@ -3,6 +3,7 @@ package edu.buffalo.www.cse4562;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +25,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 //	HashMap<String,  Long> hashSum=new HashMap<>();
 	Iterator<String> hashItr;
 	String groupByColVals="";
-	Integer init=0;
+	Integer init=0,aggrTupleSent=0;
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -126,62 +127,68 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		}
 		else
 		{
-		/*	Tuple recTuple = new Tuple();
-			Tuple retTuple = new Tuple();
-			int init =0,aggrIndex;
-			List<Object> aggrValues = new ArrayList<Object>();
-			List<Integer> aggrTypes = new ArrayList<Integer>(); // 0 for long and 1 for double
-			while((recTuple = leftChild.retNext())!=null)
+			if(aggrTupleSent == 0)
 			{
-				for(int i=0;i<aggrFunctions.size();i++)
+				Tuple recTuple = new Tuple();
+				Tuple retTuple = new Tuple();
+				int init =0,aggrIndex;
+				List<Object> aggrValues = new ArrayList<Object>();
+				List<Integer> aggrTypes = new ArrayList<Integer>(); // 0 for long and 1 for double
+				while((recTuple = leftChild.retNext())!=null)
 				{
-					aggrIndex = functionIndex.get(i);
-					if(aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
+					for(int i=0;i<aggrFunctions.size();i++)
 					{
-						
-						if(init==0)
+						aggrIndex = functionIndex.get(i);
+						if(aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
 						{
-							PrimitiveValue val = retTuple.tuple.get(aggrIndex);
-							if(val instanceof LongValue)
-							{
-								aggrValues.add(retTuple.tuple.get(aggrIndex).toLong());
-								aggrTypes.add(0);
-							}
-							else if(val instanceof DoubleValue)
-							{
-								aggrValues.add(retTuple.tuple.get(aggrIndex).toDouble());
-								aggrTypes.add(1);
-							}
-							init=1;
 							
-						}
-						else
-						{
-							PrimitiveValue val = retTuple.tuple.get(aggrIndex);
-							if(val instanceof LongValue)
+							if(init==0)
 							{
-								Long longSum=recTuple.tuple.get(aggrIndex).toLong()+val.toLong();
+								PrimitiveValue val = recTuple.tuple.get(aggrIndex);
+								if(val instanceof LongValue)
+								{
+									aggrValues.add(recTuple.tuple.get(aggrIndex).toLong());
+									aggrTypes.add(0);
+								}
+								else if(val instanceof DoubleValue)
+								{
+									aggrValues.add(recTuple.tuple.get(aggrIndex).toDouble());
+									aggrTypes.add(1);
+								}
+								
+								
 							}
-							else if(val instanceof DoubleValue)
+							else
 							{
-								doubleSum = doubleSum+val.toDouble();
+								
+								if(aggrTypes.get(i)==0)
+								{
+									long longVal = (long)aggrValues.get(i) + recTuple.tuple.get(aggrIndex).toLong();
+									aggrValues.set(i, longVal);
+								}
+								else
+								{
+									double doubleVal = ((double) aggrValues.get(i)) + recTuple.tuple.get(aggrIndex).toLong();
+									aggrValues.set(i, doubleVal);
+								}
 							}
+	
 						}
 						
-						
-						retTuple.tuple.get(functionIndex.get(i));
-						
-						
-						
-						
-						retTuple.tuple.set(functionIndex.get(i), retTuple.tuple.get(functionIndex.get(i))recTuple.tuple.get(functionIndex.get(i))))
 					}
-				}retTuple.tuple.get(functionIndex.get(i))r
+					init=1;
+				}
+				
+				aggrTupleSent=1;
+				retTuple.tuple.addAll((Collection<? extends PrimitiveValue>) aggrValues);
 				
 				
+				return retTuple;
 			}
-			*/
-			return null;
+			else
+			{
+				return null;
+			}
 		}
 	}
 
