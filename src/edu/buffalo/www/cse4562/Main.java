@@ -222,7 +222,11 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			{
 				Selection2 rightChild = (Selection2)(root.rightChild);
 				Expression expression = rightChild.expression;
-				Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
+				while(expression instanceof Column == false)
+				{
+					expression = ((BinaryExpression)expression).getLeftExpression();
+				}
+				Column colName = (Column)expression;
 				rightChildTableName = colName.getTable().getName();
 			}
 			
