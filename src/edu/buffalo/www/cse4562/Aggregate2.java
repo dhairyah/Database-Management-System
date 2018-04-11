@@ -58,6 +58,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	Tuple  retNext() throws SQLException {
 		if(this.groupByColumns!=null)
