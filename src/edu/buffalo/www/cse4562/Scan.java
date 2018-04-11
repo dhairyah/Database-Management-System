@@ -1,30 +1,32 @@
 package edu.buffalo.www.cse4562;
-import net.sf.jsqlparser.eval.Eval;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.PrimitiveValue.InvalidPrimitive;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.statement.*;
-import net.sf.jsqlparser.parser.CCJSqlParser.*;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.select.SelectBody.*;
-import net.sf.jsqlparser.statement.create.table.*;
-import net.sf.jsqlparser.statement.create.table.*;
-import java.lang.Object;
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.*;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import net.sf.jsqlparser.parser.*;
+import net.sf.jsqlparser.eval.Eval;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.select.FromItem;
 
 public class Scan  extends Tuple implements RelationalAlgebra 
 {

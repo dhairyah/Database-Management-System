@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jsqlparser.eval.Eval;
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.BooleanValue;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SubSelect;
 public class Selection extends Tuple implements RelationalAlgebra 
 {

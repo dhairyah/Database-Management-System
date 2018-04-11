@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.select.FromItem;
 
 public class SelfJoin implements RelationalAlgebra{

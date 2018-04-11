@@ -13,8 +13,6 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.PrimitiveValue.InvalidPrimitive;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
 
 public class Aggregate2 extends RelationalAlgebra2 {
 	
@@ -37,13 +35,16 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	@Override
 	List<Column> open() throws IOException {
 		colNamesChild = leftChild.open();
-		for(int i=0;i<colNamesChild.size();i++)
+		if(this.groupByColumns!=null)
 		{
-			for(int j=0;j<groupByColumns.size();j++)
+			for(int i=0;i<colNamesChild.size();i++)
 			{
-				if(colNamesChild.get(i).getColumnName().equalsIgnoreCase(groupByColumns.get(j).getColumnName()))
+				for(int j=0;j<groupByColumns.size();j++)
 				{
-					groupByIndex.add(i);
+					if(colNamesChild.get(i).getColumnName().equalsIgnoreCase(groupByColumns.get(j).getColumnName()))
+					{
+						groupByIndex.add(i);
+					}
 				}
 			}
 		}
@@ -58,67 +59,126 @@ public class Aggregate2 extends RelationalAlgebra2 {
 
 	@Override
 	Tuple  retNext() throws SQLException {
-		if(init==0)
+		if(this.groupByColumns!=null)
 		{
-			hashAggr=new HashMap<String, ArrayList<Tuple>>();
-			 while(leftChild.hasNext())
+			if(init==0)
 			{
-				Tuple retTuple = new Tuple();
-				retTuple.tuple.addAll(leftChild.retNext().tuple);
-				for(int i=0;i<groupByIndex.size();i++)
-				{
-					groupByColVals = groupByColVals+retTuple.tuple.get(groupByIndex.get(i))+"||";
-				}
-				
-				if(hashAggr.containsKey(groupByColVals))
-				{
-					hashAggr.get(groupByColVals).add(retTuple);
+				hashAggr=new HashMap<String, ArrayList<Tuple>>();
+				 while(leftChild.hasNext())
+				 {
+					Tuple retTuple = new Tuple();
+					retTuple.tuple.addAll(leftChild.retNext().tuple);
+					for(int i=0;i<groupByIndex.size();i++)
+					{
+						groupByColVals = groupByColVals+retTuple.tuple.get(groupByIndex.get(i))+"||";
+					}
+					
+					if(hashAggr.containsKey(groupByColVals))
+					{
+						hashAggr.get(groupByColVals).add(retTuple);
+						
+					}
+					else	
+					{
+						ArrayList<Tuple> tupleList = new ArrayList<Tuple>();
+						tupleList.add(retTuple);
+						hashAggr.put(groupByColVals, tupleList);
+					}
+		
+					groupByColVals="";
 					
 				}
-				else	
-				{
-					ArrayList<Tuple> tupleList = new ArrayList<Tuple>();
-					tupleList.add(retTuple);
-					hashAggr.put(groupByColVals, tupleList);
-				}
-	
-				groupByColVals="";
-				
+			init=1;
+			hashItr = hashAggr.keySet().iterator();
 			}
-		init=1;
-		hashItr = hashAggr.keySet().iterator();
-		}
-		String keyVal="";
-		List<Tuple> groupByTuples =new ArrayList<Tuple>();
-		while(hashItr.hasNext())
-		{
-			keyVal = hashItr.next();
-			groupByTuples = hashAggr.get(keyVal);
-			//List<PrimitiveValue> aggrResults = new ArrayList<PrimitiveValue>();
-			Tuple retTuple=new Tuple();
-			
-			for(int i=0;i<colNamesParent.size();i++)
+			String keyVal="";
+			List<Tuple> groupByTuples =new ArrayList<Tuple>();
+			while(hashItr.hasNext())
 			{
-				if(groupByIndex.contains(i))
+				keyVal = hashItr.next();
+				groupByTuples = hashAggr.get(keyVal);
+				//List<PrimitiveValue> aggrResults = new ArrayList<PrimitiveValue>();
+				Tuple retTuple=new Tuple();
+				
+				for(int i=0;i<colNamesParent.size();i++)
 				{
-					retTuple.tuple.add(groupByTuples.get(0).tuple.get(i));
-				}
-				else
-				{
-					if(aggrFunctions.get(functionIndex.indexOf(i)).getName().equalsIgnoreCase("sum"))
+					if(groupByIndex.contains(i))
 					{
-						retTuple.tuple.add(getSumAggr(groupByTuples,functionIndex.get(functionIndex.indexOf(i))));
+						retTuple.tuple.add(groupByTuples.get(0).tuple.get(i));
+					}
+					else
+					{
+						if(aggrFunctions.get(functionIndex.indexOf(i)).getName().equalsIgnoreCase("sum"))
+						{
+							retTuple.tuple.add(getSumAggr(groupByTuples,functionIndex.get(functionIndex.indexOf(i))));
+						}
 					}
 				}
-			}
+					
 				
-			
-						
-			
-			return retTuple;
-			
+							
+				
+				return retTuple;
+				
+			}
+			return null;
 		}
-		return null;
+		else
+		{
+			/*Tuple recTuple = new Tuple();
+			Tuple retTuple = new Tuple();
+			int init =0,aggrIndex;
+			List<Object> aggrValues = new ArrayList<Object>();
+			List<Integer> aggrTypes = new ArrayList<Integer>();
+			while(leftChild.hasNext())
+			{
+				recTuple = leftChild.retNext();
+				for(int i=0;i<aggrFunctions.size();i++)
+				{
+					aggrIndex = functionIndex.get(i);
+					if(aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
+					{
+						
+						if(init==0)
+						{
+							PrimitiveValue val = retTuple.tuple.get(aggrIndex);
+							if(val instanceof LongValue)
+							{
+								aggrValues.add(retTuple.tuple.get(aggrIndex).toLong());
+							}
+							else if(val instanceof DoubleValue)
+							{
+								aggrValues.add(retTuple.tuple.get(aggrIndex).toDouble());
+							}
+							
+						}
+						else
+						{
+							PrimitiveValue val = retTuple.tuple.get(aggrIndex);
+							if(val instanceof LongValue)
+							{
+								Long longSum=recTuple.tuple.get(aggrIndex).toLong()+val.toLong();
+							}
+							else if(val instanceof DoubleValue)
+							{
+								doubleSum = doubleSum+val.toDouble();
+							}
+						}
+						
+						
+						retTuple.tuple.get(functionIndex.get(i));
+						
+						
+						
+						
+						retTuple.tuple.set(functionIndex.get(i), retTuple.tuple.get(functionIndex.get(i))recTuple.tuple.get(functionIndex.get(i))))
+					}
+				}retTuple.tuple.get(functionIndex.get(i))r
+				
+				
+			}*/
+			return null;
+		}
 	}
 
 	@Override

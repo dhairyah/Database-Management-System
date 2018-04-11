@@ -1,27 +1,8 @@
 package edu.buffalo.www.cse4562;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.statement.*;
-import net.sf.jsqlparser.parser.CCJSqlParser.*;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.select.SelectBody.*;
-import net.sf.jsqlparser.statement.create.table.*;
-import net.sf.jsqlparser.statement.create.table.*;
-import java.lang.Object;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.*;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
-import edu.buffalo.www.cse4562.Join;
-import net.sf.jsqlparser.parser.*;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 
 public class ScanPlainSelect  extends Tuple implements RelationalAlgebra 
 {

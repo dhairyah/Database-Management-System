@@ -3,17 +3,13 @@ package edu.buffalo.www.cse4562;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jsqlparser.eval.Eval;
-import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.schema.Column;
 
 public class Join2 extends RelationalAlgebra2{
 
 	public Tuple current_left_tuple;
-	
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
@@ -25,25 +21,29 @@ public class Join2 extends RelationalAlgebra2{
 	Tuple retNext() throws SQLException {
 		
 		Tuple tupleobj = new Tuple();
- 
+		
 		Tuple rightTuple = new Tuple();			
 		
-		while ((current_left_tuple != null) || leftChild.hasNext())
+		while (true)
 		{
+			
 			if(current_left_tuple == null)
 			{
 				current_left_tuple = leftChild.retNext();
+				if(current_left_tuple==null)
+				{
+					break;
+				}
 			}
  
-			while(rightChild.hasNext())
+			while((rightTuple=rightChild.retNext())!=null)
 			{
-				rightTuple = rightChild.retNext();;
 				tupleobj.tuple.clear();
 				tupleobj.colNames.clear();
 				tupleobj.tuple.addAll(current_left_tuple.tuple);
-				tupleobj.colNames.addAll(current_left_tuple.colNames);
+				//tupleobj.colNames.addAll(current_left_tuple.colNames);
 				tupleobj.tuple.addAll(rightTuple.tuple);
-				tupleobj.colNames.addAll(rightTuple.colNames);
+				//tupleobj.colNames.addAll(rightTuple.colNames);
 
 				return tupleobj;
 			}

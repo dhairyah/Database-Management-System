@@ -1,121 +1,23 @@
-/*package edu.buffalo.www.cse4562;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.statement.*;
-import net.sf.jsqlparser.parser.CCJSqlParser.*;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.select.SelectBody.*;
-import net.sf.jsqlparser.statement.create.table.*;
-import net.sf.jsqlparser.statement.create.table.*;
-import java.lang.Object;
-import java.io.*;
-import java.sql.SQLException;
-import java.util.*;
-import net.sf.jsqlparser.parser.*;
-public class f   {
-	public static void main(String[] args) throws ParseException, SQLException {
-		System.out.println("Hello, World");
-		Reader input =  new StringReader("CREATE TABLE R(A int,B int, C int);SELECT A ,B FROM  R,E as  Iso  WHERE R.A=5 ");
-		CCJSqlParser parser=  new CCJSqlParser(input);
-		Statement statement = parser.Statement();
-		while(statement!= null)
-		{
-			if(statement instanceof Select)
-			{
-				Select select = (Select)statement ;
-				//System.out.println(select);
-			    PlainSelect sv=(PlainSelect)select.getSelectBody();                        ;
-		//		System.out.println("1:"+sv.getFromItem().getAlias());
-				BinaryExpression tt=(BinaryExpression)sv.getWhere();
-				
-		//		System.out.println(tt.getLeftExpression());
-				
-				//DateValue c=(DateValue)tt;
-				//System.out.println(c.getDate());
-				/*Reader input1 =  new StringReader(p);
-			    CCJSqlParser parser1=  new CCJSqlParser(input1);
-				Statement statement1 = parser1.Statement();
-				if(statement1 instanceof Select)
-				{
-					System.out.println("sd");
-				}*/
-				//PlainSelect sv1=(PlainSelect)pp.getSelectBody();                        
-				//System.out.println(statement1);
-			/*	if(sv instanceof Select)
-				{
-					Select select = (Select)statement ;
-					//System.out.println(select);
-				    PlainSelect sv=(PlainSelect)select.getSelectBody();                        ;
-					System.out.println(sv.getFromItem());
-					
-				}	*/
-				
-				
-	//		}
-		/*	else  if(statement instanceof CreateTable)
-			{
-				//System.out.println("sd");
-				CreateTable create=(CreateTable)statement;
-				
-			
-			//	System.out.println(create.getColumnDefinitions());
-				Tuple e=new Tuple();
-				e.s1=create.getColumnDefinitions().toString();
-				System.out.println("13:"+e.s1);
-				Tuple s= new Selection();
-				s.s1="de";
-				System.out.println(s.s1);
-				s= new Projection();
-				//Projection p= new Projection();
-				//p.api();
-				 System.out.println(s.s1);
-			    //String ss=create.getColumnDefinitions().toString();
-			    //System.out.println(ss);
-			}
-			else
-			{
-				throw new SQLException("Can't handle:"+statement);
-			}
-			statement=parser.Statement();
-			
-		 
-		}
-		
-	}
-}*/
 package edu.buffalo.www.cse4562; 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
-import net.sf.jsqlparser.expression.BooleanValue;
-import net.sf.jsqlparser.expression.DateValue;
-import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
@@ -188,6 +90,190 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 		}
 	}
 	
+	
+	public static void selectionOptimize(RelationalAlgebra2 root)
+	{
+		RelationalAlgebra2 iterate = root;
+		while(iterate != null)
+		{
+			if(iterate instanceof Selection2)
+			{
+				Selection2 selNode = (Selection2)iterate;
+				if(selNode.expression instanceof AndExpression)
+				{
+					List<Expression> expList = new ArrayList<Expression>();
+					List<RelationalAlgebra2> selObjList = new ArrayList<RelationalAlgebra2>();
+					createCondList((AndExpression)selNode.expression, expList);
+					for(int i = 0; i < expList.size(); i++)
+					{
+						RelationalAlgebra2 op = new Selection2();
+						Selection2 op1 = (Selection2)op;
+						op1.expression = expList.get(i);
+						op = (RelationalAlgebra2)op1;
+						op.parent = null;
+						op.leftChild = null;
+						op.rightChild = null;
+						selObjList.add(op);
+						
+						selOptParseTree(root, op);
+					}
+				}				
+			}
+			iterate = iterate.leftChild;
+		}
+	}
+	
+	public static void selOptParseTree(RelationalAlgebra2 root, RelationalAlgebra2 op)
+	{
+		Expression exp = ((Selection2)op).expression;
+		if(exp instanceof BinaryExpression)
+		{
+			BinaryExpression binExp = (BinaryExpression)exp;
+			if(binExp.getLeftExpression() instanceof Column && binExp.getRightExpression() instanceof Column)
+			{
+				traverseTreeJoin(root, op, null, true);
+			}
+			else
+			{
+				traverseTreeScan(root, op, null, true);
+			}
+		}
+	}
+	
+	public static boolean traverseTreeScan(RelationalAlgebra2 root, RelationalAlgebra2 op, RelationalAlgebra2 parent, boolean left)
+	{
+		boolean found = false;
+		if(root == null)
+			return false;
+		if(root instanceof Scan2)
+		{
+			Scan2 temp = (Scan2)root;
+			Selection2 selObj = (Selection2)op;
+			FromItem table = temp.fromitem;
+			String tableName = ((Table)table).getName();
+			Expression exp = selObj.expression;
+			while(exp instanceof Column == false)
+			{
+				exp = ((BinaryExpression)exp).getLeftExpression();
+			}
+			Column leftExp = (Column)exp;
+			String expTableName = leftExp.getTable().getName();
+			if(expTableName != null && tableName.equals(expTableName))
+			{
+				found = true;
+				op.parent = root.parent;
+				op.leftChild = root;
+				if(left)
+					parent.leftChild = op;
+				else
+					parent.rightChild = op;
+				root.parent = op;
+				return true;
+			}
+		}
+		
+		if(!found && root.leftChild != null)
+			found = traverseTreeScan(root.leftChild,op, root, true);
+		
+		if(!found && root.rightChild != null)
+			found = traverseTreeScan(root.rightChild,op, root, false);
+		
+		return found;
+	}
+	
+	public static boolean traverseTreeJoin(RelationalAlgebra2 root, RelationalAlgebra2 op, RelationalAlgebra2 parent, boolean left)
+	{				
+		boolean found = false;
+		if(root == null)
+			return false;
+		if(root instanceof Join2)
+		{
+			Selection2 selObj = (Selection2)op;
+			
+			Expression exp = selObj.expression;
+			Column leftExp = (Column)((BinaryExpression)exp).getLeftExpression();
+			Column rightExp = (Column)((BinaryExpression)exp).getRightExpression();
+			String leftTableName = leftExp.getTable().getName();
+			String rightTableName = rightExp.getTable().getName();
+			String leftChildTableName = "";
+			String rightChildTableName = "";
+			
+			if(root.leftChild instanceof Scan2)
+			{
+				Scan2 leftChild = (Scan2)(root.leftChild);
+				FromItem table = leftChild.fromitem;
+				leftChildTableName = ((Table)table).getName();
+			}
+			else if(root.leftChild instanceof Selection2)
+			{
+				Selection2 leftChild = (Selection2)(root.leftChild);
+				Expression expression = leftChild.expression;
+				Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
+				leftChildTableName = colName.getTable().getName();
+			}
+			
+			if(root.rightChild instanceof Scan2)
+			{
+				Scan2 rightChild = (Scan2)(root.rightChild);
+				FromItem table = rightChild.fromitem;
+				rightChildTableName = ((Table)table).getName();
+			}
+			else if(root.rightChild instanceof Selection2)
+			{
+				Selection2 rightChild = (Selection2)(root.rightChild);
+				Expression expression = rightChild.expression;
+				Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
+				rightChildTableName = colName.getTable().getName();
+			}
+			
+			if(((leftTableName.equals(leftChildTableName)) || (leftTableName.equals(rightChildTableName))) &&
+			((rightTableName.equals(leftChildTableName)) || (rightTableName.equals(rightChildTableName))))
+			{
+				found = true;
+				op.parent = root.parent;
+				op.leftChild = root;
+				if(left)
+					parent.leftChild = op;
+				else
+					parent.rightChild = op;
+				root.parent = op;
+				return true;
+			}
+		}
+		
+		if(!found && root.leftChild != null)
+			found = traverseTreeJoin(root.leftChild,op, root, true);
+		
+		if(!found && root.rightChild != null)
+			found = traverseTreeJoin(root.rightChild,op, root, false);
+		
+		return found;
+	}
+	
+	
+	public static void createCondList(AndExpression exp, List<Expression> expList)
+	{
+		Expression leftExp = exp.getLeftExpression();
+		Expression rightExp = exp.getRightExpression();
+		if(leftExp instanceof AndExpression == false)
+		{
+			expList.add(leftExp);
+		}
+		else
+		{
+			createCondList((AndExpression)leftExp, expList);
+		}
+		
+		if(rightExp instanceof AndExpression == false)
+		{
+			expList.add(rightExp);
+		}
+		else
+		{
+			createCondList((AndExpression)rightExp, expList);
+		}
+		
+	}
 	
 	
 	public static RelationalAlgebra2 createTree(PlainSelect query, String alias) {
@@ -391,7 +477,10 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				op.leftChild = leftChild;
 				op.rightChild = rightChild;
 				
-				for(int i=1;i<joinCnt;i++)
+				leftChild.parent = op;
+				rightChild.parent = op;
+				
+				for(int i=1;i<joinCnt;i++) //parent not getting set
 				{
 					
 					RelationalAlgebra2 opp = new Join2();
@@ -401,7 +490,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					
 					opp.leftChild = op;
 					opp.rightChild = right;
-					
+					right.parent = opp;					
 					op.parent = opp;
 					op = opp;
 					
@@ -441,10 +530,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 		
 		return root;
 	}
-	private static void test() throws IOException, SQLException
-	{
-		Reader reader = Files.newBufferedReader(Paths.get("data//"+"prajin.dat"));
-	}
+
 	public static void main(String[] args) throws ParseException, SQLException {
 		
 		RelationalAlgebra2 treeRoot = null;
@@ -475,6 +561,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					}
 					treeRoot = createTree(plain,"");
 					
+					selectionOptimize(treeRoot);
+					
 					try 
 					{
 						ParseTree(treeRoot);
@@ -487,11 +575,11 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					
 					
 				}
-				int i = 0;
+
 			}
 			else if(statement instanceof CreateTable) {
 				CreateTable create1 = (CreateTable) statement;
-				int k = 0;
+
 				String tableName = create1.getTable().getName().toLowerCase() ;
 				map.put(tableName, create1);
 			}
