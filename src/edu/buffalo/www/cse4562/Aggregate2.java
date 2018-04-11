@@ -168,7 +168,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 								}
 								else
 								{
-									double doubleVal = ((double) aggrValues.get(i)) + recTuple.tuple.get(aggrIndex).toLong();
+									double doubleVal = ((double) aggrValues.get(i)) + recTuple.tuple.get(aggrIndex).toDouble();
 									aggrValues.set(i, doubleVal);
 								}
 							}
