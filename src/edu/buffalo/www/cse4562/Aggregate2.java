@@ -131,9 +131,8 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			int init =0,aggrIndex;
 			List<Object> aggrValues = new ArrayList<Object>();
 			List<Integer> aggrTypes = new ArrayList<Integer>(); // 0 for long and 1 for double
-			while(leftChild.hasNext())
+			while((recTuple = leftChild.retNext())!=null)
 			{
-				recTuple = leftChild.retNext();
 				for(int i=0;i<aggrFunctions.size();i++)
 				{
 					aggrIndex = functionIndex.get(i);

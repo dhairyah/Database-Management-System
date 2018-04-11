@@ -2,7 +2,6 @@ package edu.buffalo.www.cse4562;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -303,7 +302,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 		List<Function> functionList = new ArrayList<Function>();  //list of aggr functions in order
 		List<Integer> functionIndex = new ArrayList<Integer>(); 
 		List<SelectItem> aggrProjection = new ArrayList<SelectItem>(); //SelectItem stmtm without functions to be passed to proj below aggr 
-		String projSelectStmt = "";
+//		String projSelectStmt = "";
 		List<Column> parentProj = new ArrayList<Column>(); //list of columns with aliases after applying aggr to be passed above
 		
 		Iterator<SelectItem> columnName =  query.getSelectItems().iterator();
@@ -326,6 +325,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					
 					functionList.add(((Function) currItem));
 					functionIndex.add(index);
+					/*
 					if(projSelectStmt.equals(""))
 					{
 						projSelectStmt = projSelectStmt + (((Function) currItem).getParameters().getExpressions().get(0).toString());
@@ -334,11 +334,19 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					{
 						projSelectStmt = projSelectStmt + ","+((Function) currItem).getParameters().getExpressions().get(0).toString();
 					}
+					*/
+					
+					SelectItem selectItem = new SelectExpressionItem();
+					SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
+					selectExpressionItem.setExpression(((Function) currItem).getParameters().getExpressions().get(0));
+					SelectItem selectItem2 = (SelectItem)selectExpressionItem;
+					aggrProjection.add(selectItem2);
 					
 					aggr=1;
 				}
 				else
 				{
+					/*
 					if(projSelectStmt.equals(""))
 					{
 						projSelectStmt = projSelectStmt + currSelectItem.toString();
@@ -347,6 +355,9 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					{
 						projSelectStmt = projSelectStmt + ","+currSelectItem.toString();
 					}
+					*/
+
+					aggrProjection.add(currSelectItem);
 				}
 				
 				
@@ -373,6 +384,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 		
 		if(aggr==1)
 		{
+			/*
 			Reader input = new StringReader("select "+projSelectStmt+" from xyz");
 			CCJSqlParser parser = new CCJSqlParser(input);
 			Statement statement = null;
@@ -383,7 +395,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				e.printStackTrace();
 			}
 			aggrProjection =  ((PlainSelect) ((Select) statement).getSelectBody()).getSelectItems();
-			
+			*/
 			RelationalAlgebra2 op = new Aggregate2();
 			Aggregate2 op1 = (Aggregate2)op;
 			op1.groupByColumns = query.getGroupByColumnReferences();
