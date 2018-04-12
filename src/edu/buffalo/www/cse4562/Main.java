@@ -150,6 +150,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			Selection2 selObj = (Selection2)op;
 			FromItem table = temp.fromitem;
 			String tableName = ((Table)table).getName();
+			String tableAlias = ((Table)table).getAlias();
 			Expression exp = selObj.expression;
 			while(exp instanceof Column == false)
 			{
@@ -157,7 +158,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			}
 			Column leftExp = (Column)exp;
 			String expTableName = leftExp.getTable().getName();
-			if(expTableName != null && tableName.equals(expTableName))
+			if((expTableName != null && tableName.equals(expTableName)) || (tableAlias != null && tableAlias.equals(expTableName)))
 			{
 				found = true;
 				op.parent = root.parent;
@@ -196,12 +197,16 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			String rightTableName = rightExp.getTable().getName();
 			String leftChildTableName = "";
 			String rightChildTableName = "";
+			String leftChildTableAlias = "";
+			String rightChildTableAlias = "";
 			
 			if(root.leftChild instanceof Scan2)
 			{
 				Scan2 leftChild = (Scan2)(root.leftChild);
 				FromItem table = leftChild.fromitem;
 				leftChildTableName = ((Table)table).getName();
+				leftChildTableAlias = ((Table)table).getAlias();
+				
 			}
 			else if(root.leftChild instanceof Selection2)
 			{
@@ -209,6 +214,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				Expression expression = leftChild.expression;
 				Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
 				leftChildTableName = colName.getTable().getName();
+				leftChildTableAlias = colName.getTable().getAlias();
 			}
 			
 			if(root.rightChild instanceof Scan2)
@@ -216,6 +222,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				Scan2 rightChild = (Scan2)(root.rightChild);
 				FromItem table = rightChild.fromitem;
 				rightChildTableName = ((Table)table).getName();
+				rightChildTableAlias = ((Table)table).getAlias();
 			}
 			else if(root.rightChild instanceof Selection2)
 			{
@@ -227,10 +234,13 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				}
 				Column colName = (Column)expression;
 				rightChildTableName = colName.getTable().getName();
+				rightChildTableAlias = colName.getTable().getAlias();
 			}
 			
-			if(((leftTableName.equals(leftChildTableName)) || (leftTableName.equals(rightChildTableName))) &&
-			((rightTableName.equals(leftChildTableName)) || (rightTableName.equals(rightChildTableName))))
+			if((((leftChildTableName.equals(leftTableName)) || (leftChildTableName.equals(rightTableName))) || 
+					((leftChildTableAlias != null) && ((leftChildTableAlias.equals(leftTableName)) || (leftChildTableAlias.equals(rightTableName))))) &&
+					(((rightChildTableName.equals(leftTableName)) || (rightChildTableName.equals(rightTableName))) || 
+					((rightChildTableAlias != null) && ((rightChildTableAlias.equals(leftTableName)) || (rightChildTableAlias.equals(rightTableName))))))
 			{
 				found = true;
 				op.parent = root.parent;
