@@ -149,37 +149,36 @@ public class Projection2 extends RelationalAlgebra2{
 			sl.add(tt);
 		}
 
-		for (int j = 0; j < ps; j++)
-		{
-			Eval eval = new Eval() {
+		Eval eval = new Eval() {
 
-				@Override
-				public PrimitiveValue eval(Column arg0) throws SQLException {
-					int index = colNamesChild.indexOf(arg0);
-					//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
-					if(index == -1)
+			@Override
+			public PrimitiveValue eval(Column arg0) throws SQLException {
+				int index = colNamesChild.indexOf(arg0);
+				//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
+				if(index == -1)
+				{
+					int size = colNamesChild.size();
+					for(int it = 0; it < size; it++)
 					{
-						int size = colNamesChild.size();
-						for(int it = 0; it < size; it++)
+						if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+								(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
 						{
-							if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
-									(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
-							{
-								index = it;
-								break;
-							}
+							index = it;
+							break;
 						}
-
 					}
-					return t.tuple.get(index);
 
 				}
-			};
+				return t.tuple.get(index);
+
+			}
+		};
+		for (int j = 0; j < ps; j++)
+		{
 			SelectItem i = projection.get(j);
 			if(i instanceof SelectExpressionItem)
 			{
 				SelectExpressionItem k = (SelectExpressionItem)i;
-				String alias = k.getAlias();
 
 				Expression expr = k.getExpression();
 				PrimitiveValue type = eval.eval(expr);
