@@ -106,6 +106,7 @@ import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
@@ -134,107 +135,110 @@ public class Join2 extends RelationalAlgebra2{
 		
 		if(this.parent instanceof Selection2)
 		{
-			if(init == 0)
+			Selection2 selObj = (Selection2)(this.parent);
+			Expression condExp = selObj.expression;
+			if(condExp instanceof EqualsTo)
 			{
-				Selection2 selObj = (Selection2)(this.parent);
-				Expression condExp = selObj.expression;
-				Column leftExp = (Column)((BinaryExpression)condExp).getLeftExpression();
-				Column rightExp = (Column)((BinaryExpression)condExp).getRightExpression();
-				Tuple childTuple = new Tuple();	
-				hashJoin = new HashMap<String, ArrayList<Tuple>>();
-				
-				
-				String leftTableName = leftExp.getTable().getName();
-				String rightTableName = rightExp.getTable().getName();
-				String leftChildTableName = "";
-				String rightChildTableName = "";
-				
-				if(this.leftChild instanceof Scan2)
+				if(init == 0)
 				{
-					Scan2 leftChild = (Scan2)(this.leftChild);
-					FromItem table = leftChild.fromitem;
-					leftChildTableName = ((Table)table).getName();
-				}
-				else if(this.leftChild instanceof Selection2)
-				{
-					Selection2 leftChild = (Selection2)(this.leftChild);
-					Expression expression = leftChild.expression;
-					Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
-					leftChildTableName = colName.getTable().getName();
-				}
-				
-				if(this.rightChild instanceof Scan2)
-				{
-					Scan2 rightChild = (Scan2)(this.rightChild);
-					FromItem table = rightChild.fromitem;
-					rightChildTableName = ((Table)table).getName();
-				}
-				else if(this.rightChild instanceof Selection2)
-				{
-					Selection2 rightChild = (Selection2)(this.rightChild);
-					Expression expression = rightChild.expression;
-					while(expression instanceof Column == false)
+					Column leftExp = (Column)((BinaryExpression)condExp).getLeftExpression();
+					Column rightExp = (Column)((BinaryExpression)condExp).getRightExpression();
+					Tuple childTuple = new Tuple();	
+					hashJoin = new HashMap<String, ArrayList<Tuple>>();
+					
+					
+					String leftTableName = leftExp.getTable().getName();
+					String rightTableName = rightExp.getTable().getName();
+					String leftChildTableName = "";
+					String rightChildTableName = "";
+					
+					if(this.leftChild instanceof Scan2)
 					{
-						expression = ((BinaryExpression)expression).getLeftExpression();
+						Scan2 leftChild = (Scan2)(this.leftChild);
+						FromItem table = leftChild.fromitem;
+						leftChildTableName = ((Table)table).getName();
 					}
-					Column colName = (Column)expression;
-					rightChildTableName = colName.getTable().getName();
-				}
-				
-				if(rightChildTableName.equals(rightTableName))
-				{
-					key = rightExp;
-					useHashJoin = true;
-					leftKey = leftExp;
-				}
-				else
-				{
-					key = leftExp;
-					useHashJoin = true;
-					leftKey = rightExp;
-				}
-				if(useHashJoin)
-				{
-					while((childTuple=rightChild.retNext())!=null)
+					else if(this.leftChild instanceof Selection2)
 					{
-						Tuple retTuple = new Tuple();
-						retTuple.tuple.addAll(childTuple.tuple);
-						Eval eval = new Eval() {
-							@Override
-							public PrimitiveValue eval(Column arg0) throws SQLException {
-								int index = rightChildCols.indexOf(arg0);
-								if(index == -1)
-								{
-									int size = rightChildCols.size();
-									for(int it = 0; it < size; it++)
+						Selection2 leftChild = (Selection2)(this.leftChild);
+						Expression expression = leftChild.expression;
+						Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
+						leftChildTableName = colName.getTable().getName();
+					}
+					
+					if(this.rightChild instanceof Scan2)
+					{
+						Scan2 rightChild = (Scan2)(this.rightChild);
+						FromItem table = rightChild.fromitem;
+						rightChildTableName = ((Table)table).getName();
+					}
+					else if(this.rightChild instanceof Selection2)
+					{
+						Selection2 rightChild = (Selection2)(this.rightChild);
+						Expression expression = rightChild.expression;
+						while(expression instanceof Column == false)
+						{
+							expression = ((BinaryExpression)expression).getLeftExpression();
+						}
+						Column colName = (Column)expression;
+						rightChildTableName = colName.getTable().getName();
+					}
+					
+					if(rightChildTableName.equals(rightTableName))
+					{
+						key = rightExp;
+						useHashJoin = true;
+						leftKey = leftExp;
+					}
+					else
+					{
+						key = leftExp;
+						useHashJoin = true;
+						leftKey = rightExp;
+					}
+					if(useHashJoin)
+					{
+						while((childTuple=rightChild.retNext())!=null)
+						{
+							Tuple retTuple = new Tuple();
+							retTuple.tuple.addAll(childTuple.tuple);
+							Eval eval = new Eval() {
+								@Override
+								public PrimitiveValue eval(Column arg0) throws SQLException {
+									int index = rightChildCols.indexOf(arg0);
+									if(index == -1)
 									{
-										if((arg0.getTable().getName().equalsIgnoreCase(rightChildCols.get(it).getTable().getAlias())) && 
-												(arg0.getColumnName().equalsIgnoreCase(rightChildCols.get(it).getColumnName())))
+										int size = rightChildCols.size();
+										for(int it = 0; it < size; it++)
 										{
-											index = it;
-											break;
+											if((arg0.getTable().getName().equalsIgnoreCase(rightChildCols.get(it).getTable().getAlias())) && 
+													(arg0.getColumnName().equalsIgnoreCase(rightChildCols.get(it).getColumnName())))
+											{
+												index = it;
+												break;
+											}
 										}
 									}
+									return retTuple.tuple.get(index);
 								}
-								return retTuple.tuple.get(index);
+					
+							};
+							String colValKey = eval.eval(key).toString();
+							if(hashJoin.containsKey(colValKey))
+							{
+								hashJoin.get(colValKey).add(retTuple);
+								
 							}
-				
-						};
-						String colValKey = eval.eval(key).toString();
-						if(hashJoin.containsKey(colValKey))
-						{
-							hashJoin.get(colValKey).add(retTuple);
-							
-						}
-						else	
-						{
-							ArrayList<Tuple> tupleList = new ArrayList<Tuple>();
-							tupleList.add(retTuple);
-							hashJoin.put(colValKey, tupleList);
+							else	
+							{
+								ArrayList<Tuple> tupleList = new ArrayList<Tuple>();
+								tupleList.add(retTuple);
+								hashJoin.put(colValKey, tupleList);
+							}
 						}
 					}
+					init = 1;
 				}
-				init = 1;
 			}
 		}
 		
@@ -369,4 +373,3 @@ public class Join2 extends RelationalAlgebra2{
 
 
 }
-
