@@ -149,21 +149,23 @@ public class Join2 extends RelationalAlgebra2{
 					
 					String leftTableName = leftExp.getTable().getName();
 					String rightTableName = rightExp.getTable().getName();
-					String leftChildTableName = "";
-					String rightChildTableName = "";
+				//	String leftChildTableName = "",leftChildTableAliasName="";
+					String rightChildTableName = "",rightChildTableAliasName="";
 					
 					if(this.leftChild instanceof Scan2)
 					{
 						Scan2 leftChild = (Scan2)(this.leftChild);
 						FromItem table = leftChild.fromitem;
-						leftChildTableName = ((Table)table).getName();
+				//		leftChildTableName = ((Table)table).getName();
+				//		leftChildTableAliasName = ((Table)table).getAlias();
 					}
 					else if(this.leftChild instanceof Selection2)
 					{
 						Selection2 leftChild = (Selection2)(this.leftChild);
 						Expression expression = leftChild.expression;
 						Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
-						leftChildTableName = colName.getTable().getName();
+				//		leftChildTableName = colName.getTable().getName();
+				//		leftChildTableAliasName = colName.getTable().getAlias();
 					}
 					
 					if(this.rightChild instanceof Scan2)
@@ -171,6 +173,7 @@ public class Join2 extends RelationalAlgebra2{
 						Scan2 rightChild = (Scan2)(this.rightChild);
 						FromItem table = rightChild.fromitem;
 						rightChildTableName = ((Table)table).getName();
+						rightChildTableAliasName = ((Table)table).getAlias();
 					}
 					else if(this.rightChild instanceof Selection2)
 					{
@@ -182,9 +185,10 @@ public class Join2 extends RelationalAlgebra2{
 						}
 						Column colName = (Column)expression;
 						rightChildTableName = colName.getTable().getName();
+						rightChildTableAliasName = colName.getTable().getAlias();
 					}
 					
-					if(rightChildTableName.equals(rightTableName))
+					if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
 					{
 						key = rightExp;
 						useHashJoin = true;
