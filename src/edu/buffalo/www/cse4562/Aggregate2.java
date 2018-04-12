@@ -114,6 +114,10 @@ public class Aggregate2 extends RelationalAlgebra2 {
 						{
 							retTuple.tuple.add(getSumAggr(groupByTuples,functionIndex.get(functionIndex.indexOf(i))));
 						}
+						else if(aggrFunctions.get(functionIndex.indexOf(i)).getName().equalsIgnoreCase("avg"))
+						{
+							retTuple.tuple.add(getAvgAggr(groupByTuples,functionIndex.get(functionIndex.indexOf(i))));
+						}
 					}
 				}
 					
@@ -246,6 +250,41 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		else
 		{
 			PrimitiveValue d = new DoubleValue(doubleSum);
+			return d;
+		}
+		
+	}
+	PrimitiveValue getAvgAggr(List<Tuple> allTuples,Integer aggrIndex) throws InvalidPrimitive
+	{
+		Iterator<Tuple> tupleItr = allTuples.iterator();
+		long longSum=0;
+		double doubleSum=0.0; 
+		int retType=-1; // 0 for long and 1 for double
+		int cnt = allTuples.size();
+		while(tupleItr.hasNext())
+		{
+			PrimitiveValue val = tupleItr.next().tuple.get(aggrIndex);
+			if(val instanceof LongValue)
+			{
+				longSum=longSum+val.toLong();
+				retType=0;
+			}
+			else if(val instanceof DoubleValue)
+			{
+				doubleSum = doubleSum+val.toDouble();
+				retType=1;
+			}
+			
+		}
+		
+		if(retType==0)
+		{
+			PrimitiveValue d = new LongValue(longSum/cnt);
+			return d;
+		}
+		else
+		{
+			PrimitiveValue d = new DoubleValue(doubleSum/cnt);
 			return d;
 		}
 		
