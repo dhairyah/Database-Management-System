@@ -40,7 +40,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 				return null;
 			}};
 
-			/*if(v1 instanceof StringValue)
+			if(v1 instanceof StringValue)
 			{
 				temp_v1 = v1.toString();
 				temp_v2 = v2.toString();
@@ -109,7 +109,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 				{
 					return result_int * (-1);
 				}
-			}*/
+			}
 
 			try {
 				result_prim = eval.eval( new EqualsTo(v1,v2));
@@ -123,7 +123,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 				{
 					v1=arg0.get(orderByIndex_2);
 					v2=arg1.get(orderByIndex_2);
-					/*if(v1 instanceof StringValue)
+					if(v1 instanceof StringValue)
 					{
 						temp_v1 = v1.toString();
 						temp_v2 = v2.toString();
@@ -137,7 +137,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 							return result_int * (-1);
 						}
 					}
-					else*/
+					else
 					{
 						try {
 							result_prim = eval.eval( new GreaterThan(v1,v2));
