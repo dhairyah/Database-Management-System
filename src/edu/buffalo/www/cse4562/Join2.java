@@ -104,14 +104,16 @@ public class Join2 extends RelationalAlgebra2{
 	public Tuple current_left_tuple;
 	HashMap<String,  ArrayList<Tuple>> hashJoin;
 	Integer init = 0;
+	boolean leftFinish = false;
 	Iterator<Tuple> listItr = null;
+	Iterator<Tuple> leftListItr = null;
 	List<Tuple> tupleList;
 	Column key;
 	Column leftKey;
 	boolean useHashJoin = false;
 	List<Column> leftChildCols = new ArrayList<Column>();
 	List<Column> rightChildCols = new ArrayList<Column>();
-	
+	List <Tuple> leftList = new ArrayList<Tuple>();
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
@@ -244,10 +246,36 @@ public class Join2 extends RelationalAlgebra2{
 		{
 			while (true)
 			{
+				if(leftFinish && leftListItr.hasNext() == false)
+					return null;
 				
+				if(leftList.isEmpty())
+				{
+					int count = 0;
+					while(count <= 100)
+					{
+						Tuple temp = new Tuple();
+						temp = leftChild.retNext();
+						if(temp == null)
+						{
+							leftFinish = true;
+							break;
+						}
+						Tuple temp1 = new Tuple();
+						temp1.tuple.addAll(temp.tuple);
+						leftList.add(temp1);
+						count ++;
+					}
+					leftListItr = leftList.iterator();
+				}
 				if(current_left_tuple == null)
 				{
-					current_left_tuple = leftChild.retNext();
+					if(leftListItr.hasNext() == false)
+					{
+						leftList.clear();
+						continue;
+					}
+					current_left_tuple = leftListItr.next();
 					if(current_left_tuple==null)
 					{
 						break;
