@@ -35,6 +35,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
     static int l=-1;
 	static int c=0;
 	static int f=0;
+	static int optimizeFlag=0;
 	
 	private static void ParseTree(RelationalAlgebra2 root) throws IOException, SQLException
 	{		
@@ -532,7 +533,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			
 			if(query.getJoins()!=null)
 			{
-
+				optimizeFlag=1;
 				int joinCnt=query.getJoins().size();
 				
 				RelationalAlgebra2 op = new Join2();
@@ -646,8 +647,10 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					}
 					treeRoot = createTree(plain,"");
 					
-					selectionOptimize(treeRoot);
-					
+					if(optimizeFlag==1)
+					{
+						selectionOptimize(treeRoot);
+					}
 					try 
 					{
 						ParseTree(treeRoot);
