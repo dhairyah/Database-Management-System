@@ -419,7 +419,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			String keyVal="";
 			//List<Tuple> groupByTuples =new ArrayList<Tuple>();
 			int avgCnt=0;
-			Tuple retTuple = new Tuple();
+			Tuple retTuple;
 			PrimitiveValue val;
 			while(hashItr.hasNext())
 			{
