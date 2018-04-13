@@ -503,6 +503,13 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				op.leftChild = leftChild;
 				op.rightChild = rightChild;
 				
+				op.childTables.add(from.toString());
+				op.childTables.add(query.getJoins().get(0).getRightItem().toString());
+				
+				op.childTableAliases.add(from.getAlias());
+				op.childTableAliases.add(query.getJoins().get(0).getRightItem().getAlias());
+				
+				
 				leftChild.parent = op;
 				rightChild.parent = op;
 				
@@ -516,6 +523,15 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					
 					opp.leftChild = op;
 					opp.rightChild = right;
+					
+					
+					opp.childTables.addAll(op.childTables);
+					opp.childTables.add(query.getJoins().get(i).getRightItem().toString());
+					
+					opp.childTableAliases.addAll(op.childTableAliases);
+					opp.childTableAliases.add(query.getJoins().get(i).getRightItem().getAlias());
+					
+					
 					right.parent = opp;					
 					op.parent = opp;
 					op = opp;

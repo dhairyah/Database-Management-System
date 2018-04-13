@@ -123,6 +123,7 @@ public class Join2 extends RelationalAlgebra2{
 	boolean useHashJoin = false;
 	List<Column> leftChildCols = new ArrayList<Column>();
 	List<Column> rightChildCols = new ArrayList<Column>();
+	
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
