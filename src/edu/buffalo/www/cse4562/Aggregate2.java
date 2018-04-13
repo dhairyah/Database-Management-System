@@ -372,39 +372,12 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	Tuple  retNext() throws SQLException {
 		if(this.groupByColumns!=null)
 		{
+			
 			if(init==0)
 			{
-				Tuple childTuple;
-				hashAggr=new HashMap<String, Tuple>();
-				aggrKeyCnt = new HashMap<String, Integer>();
-				while((childTuple=leftChild.retNext())!=null)
-				{
-					for(int i=0;i<groupByIndex.size();i++)
-					{
-						groupByColVals = groupByColVals+childTuple.tuple.get(groupByIndex.get(i))+"||";
-					}
-					
-					if(hashAggr.containsKey(groupByColVals))
-					{
-						
-						computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
-						hashAggr.put(groupByColVals, childTuple);
-						aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
-						
-					}
-					else	
-					{
-						hashAggr.put(groupByColVals, childTuple);
-						aggrKeyCnt.put(groupByColVals, 1);
-					}
-		
-					groupByColVals="";
-				}
-				init=1;
-				hashItr = hashAggr.keySet().iterator();
-				
-				
+				firstTimeCall();
 			}
+			
 			String keyVal="";
 			//List<Tuple> groupByTuples =new ArrayList<Tuple>();
 			int avgCnt=0;
@@ -620,6 +593,38 @@ public class Aggregate2 extends RelationalAlgebra2 {
 						
 		}		
 		
+	}
+	
+	void firstTimeCall() throws SQLException
+	{
+		Tuple childTuple;
+		hashAggr=new HashMap<String, Tuple>();
+		aggrKeyCnt = new HashMap<String, Integer>();
+		while((childTuple=leftChild.retNext())!=null)
+		{
+			for(int i=0;i<groupByIndex.size();i++)
+			{
+				groupByColVals = groupByColVals+childTuple.tuple.get(groupByIndex.get(i))+"||";
+			}
+			
+			if(hashAggr.containsKey(groupByColVals))
+			{
+				
+				this.computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
+				hashAggr.put(groupByColVals, childTuple);
+				aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
+				
+			}
+			else	
+			{
+				hashAggr.put(groupByColVals, childTuple);
+				aggrKeyCnt.put(groupByColVals, 1);
+			}
+
+			groupByColVals="";
+		}
+		init=1;
+		hashItr = hashAggr.keySet().iterator();
 	}
 
 }
