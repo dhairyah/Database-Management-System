@@ -407,7 +407,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					else	
 					{
 						hashAggr.put(groupByColVals, childTuple);
-						aggrKeyCnt.put(groupByColVals, 0);
+						aggrKeyCnt.put(groupByColVals, 1);
 					}
 		
 					groupByColVals="";
@@ -622,14 +622,14 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		for(int i=0;i<aggrFunctions.size();i++)
 		{
 			aggrIndex = functionIndex.get(i);
-			if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg") || aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
-			{
+			//if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg") || aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
+			//{
 				
 				val = aggrTuple.tuple.get(aggrIndex);
 				val = eval.eval(new Addition(val,nextTuple.tuple.get(aggrIndex)));
 				nextTuple.tuple.set(aggrIndex, val);
 				
-			}
+			//}
 						
 		}		
 		
