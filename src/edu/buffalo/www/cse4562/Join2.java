@@ -189,7 +189,8 @@ public class Join2 extends RelationalAlgebra2{
 						rightChildTableAliasName = colName.getTable().getAlias();
 					}
 					
-					if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
+					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
+					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && (childTables.indexOf(rightTableName) == childTables.size() - 1))
 					{
 						key = rightExp;
 						useHashJoin = true;
