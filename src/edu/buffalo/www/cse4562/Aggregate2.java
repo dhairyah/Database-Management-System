@@ -1,5 +1,4 @@
 /*package edu.buffalo.www.cse4562;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
@@ -17,7 +15,6 @@ import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.PrimitiveValue.InvalidPrimitive;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
-
 public class Aggregate2 extends RelationalAlgebra2 {
 	
 	List<Column> groupByColumns = new ArrayList<Column>();
@@ -29,13 +26,11 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	Iterator<String> hashItr;
 	String groupByColVals="";
 	Integer init=0,aggrTupleSent=0;
-
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 	@Override
 	List<Column> open() throws IOException {
 		colNamesChild = leftChild.open();
@@ -54,13 +49,11 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		}
 		return colNamesParent;
 	}
-
 	@Override
 	void close() {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	Tuple  retNext() throws SQLException {
 		if(this.groupByColumns!=null)
@@ -211,12 +204,10 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			}
 		}
 	}
-
 	@Override
 	boolean hasNext() throws SQLException {
 		return false; //since it is a blocking operator
 	}
-
 	@Override
 	void reset() {
 		leftChild.reset();
@@ -229,7 +220,6 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			public PrimitiveValue eval(Column arg0) throws SQLException {
 				return null;
 			}
-
 		};
 		
 		Iterator<Tuple> tupleItr = allTuples.iterator();
@@ -301,7 +291,6 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		}
 		
 	}
-
 }
 */
 
@@ -336,9 +325,6 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	List<Integer> groupByIndex = new ArrayList<Integer>();
 	List<Integer> functionIndex = new ArrayList<Integer>(); 
 	HashMap<String,Tuple> hashAggr;
-	HashMap<String,List<Object>> hashAggrValues;
-	List<Object> aggrValues = new ArrayList<Object>();
-	List<Integer> aggrTypes = new ArrayList<Integer>(); // 0 for long and 1 for double
 	HashMap<String,Integer> aggrKeyCnt;
 //	HashMap<String,  Long> hashSum=new HashMap<>();
 	Iterator<String> hashItr;
@@ -388,28 +374,10 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		{
 			if(init==0)
 			{
-				Tuple childTuple = leftChild.retNext();
+				Tuple childTuple;
 				hashAggr=new HashMap<String, Tuple>();
-				hashAggrValues = new HashMap<String, List<Object>>();
-				
-				for(int i=0;i<aggrFunctions.size();i++)
-				{
-					PrimitiveValue val = childTuple.tuple.get(functionIndex.get(i));
-					if(val instanceof LongValue)
-					{
-						aggrValues.add(0);
-						aggrTypes.add(0);
-					}
-					else if(val instanceof DoubleValue)
-					{
-						aggrValues.add(0.0);
-						aggrTypes.add(1);
-					}
-				}
-				
 				aggrKeyCnt = new HashMap<String, Integer>();
-				int aggrIndex;
-				while(childTuple!=null)
+				while((childTuple=leftChild.retNext())!=null)
 				{
 					for(int i=0;i<groupByIndex.size();i++)
 					{
@@ -418,55 +386,19 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					
 					if(hashAggr.containsKey(groupByColVals))
 					{
-						List<Object> retAggr = new ArrayList<Object>();
-						//computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
-						//hashAggr.put(groupByColVals, childTuple);
+						
+						computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
+						hashAggr.put(groupByColVals, childTuple);
 						aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
-						//aggrValues.clear();
-						retAggr.addAll(hashAggrValues.get(groupByColVals)); 
-						for(int i=0;i<aggrFunctions.size();i++)
-						{
-							aggrIndex= functionIndex.get(i);
-							if(aggrTypes.get(i)==0)
-							{
-								long longVal = (long)retAggr.get(i) + childTuple.tuple.get(aggrIndex).toLong();
-								retAggr.set(i, longVal);
-							}
-							else
-							{
-								double doubleVal = ((double) retAggr.get(i)) + childTuple.tuple.get(aggrIndex).toDouble();
-								retAggr.set(i, doubleVal);
-							}
-						}
-						hashAggrValues.put(groupByColVals, retAggr);
 						
 					}
 					else	
 					{
-						List<Object> retAggr = new ArrayList<Object>();
 						hashAggr.put(groupByColVals, childTuple);
 						aggrKeyCnt.put(groupByColVals, 1);
-
-						for(int i=0;i<aggrFunctions.size();i++)
-						{
-							aggrIndex= functionIndex.get(i);
-							if(aggrTypes.get(i)==0)
-							{
-								long longVal = childTuple.tuple.get(aggrIndex).toLong();
-								aggrValues.set(i, longVal);
-							}
-							else
-							{
-								double doubleVal = childTuple.tuple.get(aggrIndex).toDouble();
-								aggrValues.set(i, doubleVal);
-							}
-						}
-						retAggr.addAll(aggrValues);
-						hashAggrValues.put(groupByColVals, retAggr);
 					}
 		
 					groupByColVals="";
-					childTuple = leftChild.retNext();
 				}
 				init=1;
 				hashItr = hashAggr.keySet().iterator();
@@ -478,32 +410,19 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			int avgCnt=0;
 			Tuple retTuple;
 			PrimitiveValue val;
-			List<Object> retAggr;
 			while(hashItr.hasNext())
 			{
 				keyVal = hashItr.next();
 				avgCnt = aggrKeyCnt.get(keyVal);
-				retAggr = hashAggrValues.get(keyVal);
-				
 				
 				retTuple = hashAggr.get(keyVal);
 				for(int i=0;i<aggrFunctions.size();i++)
 				{
-					/*if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg"))
+					if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg"))
 					{
 						val = retTuple.tuple.get(functionIndex.get(i));
 						Expression divide = new Division(val,new LongValue(avgCnt));
 						retTuple.tuple.set(functionIndex.get(i), eval.eval(divide)) ;
-					}
-					*/
-					
-					if(aggrTypes.get(i)==0)
-					{
-						retTuple.tuple.set(functionIndex.get(i), new LongValue((long) retAggr.get(i))) ;
-					}
-					else
-					{
-						retTuple.tuple.set(functionIndex.get(i), new DoubleValue((double) retAggr.get(i))) ;
 					}
 					
 				}
