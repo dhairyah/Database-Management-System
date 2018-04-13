@@ -35,6 +35,13 @@ public class OrderBy2 extends RelationalAlgebra2
 		// TODO Auto-generated method stub
 		colNamesChild = leftChild.open();
 		colNamesParent.addAll(colNamesChild);
+		orderByIndex_1 = colNamesChild.indexOf((Column) element.get(0).getExpression());
+		//System.out.println("tuple.col"+tupleobj.colNames);
+		//System.out.println("OXXX:"+(Column) element.get(0).getExpression());
+		if(element.size() > 1)
+			orderByIndex_2 = colNamesChild.indexOf((Column) element.get(1).getExpression());
+		else
+			orderByIndex_2 = -1;
 		return colNamesParent;
 	}
 
@@ -52,13 +59,6 @@ public class OrderBy2 extends RelationalAlgebra2
 		{
 		   	
 			otable.add(new ArrayList<PrimitiveValue>());
-			orderByIndex_1 = colNamesChild.indexOf((Column) element.get(0).getExpression());
-			//System.out.println("tuple.col"+tupleobj.colNames);
-			//System.out.println("OXXX:"+(Column) element.get(0).getExpression());
-			if(element.size() > 1)
-				orderByIndex_2 = colNamesChild.indexOf((Column) element.get(1).getExpression());
-			else
-				orderByIndex_2 = -1;
 
 			for(int i = 0; i < tupleobj.tuple.size(); i++)
 			{

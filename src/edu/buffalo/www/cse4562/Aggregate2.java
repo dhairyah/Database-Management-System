@@ -314,7 +314,6 @@ package edu.buffalo.www.cse4562;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -386,7 +385,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		{
 			if(init==0)
 			{
-				Tuple childTuple = new Tuple();
+				Tuple childTuple;
 				hashAggr=new HashMap<String, Tuple>();
 				aggrKeyCnt = new HashMap<String, Integer>();
 				while((childTuple=leftChild.retNext())!=null)
