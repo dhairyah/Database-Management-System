@@ -425,7 +425,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			while(hashItr.hasNext())
 			{
 				keyVal = hashItr.next();
-				avgCnt = aggrKeyCnt.get(keyVal);
+				/*avgCnt = aggrKeyCnt.get(keyVal);
 				
 				retTuple = hashAggr.get(keyVal);
 				for(int i=0;i<aggrFunctions.size();i++)
@@ -440,6 +440,8 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				}
 				
 				return retTuple;
+				*/
+				return hashAggr.get(keyVal);
 				
 			}
 			return null;
