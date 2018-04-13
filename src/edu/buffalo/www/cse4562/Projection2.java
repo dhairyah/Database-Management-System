@@ -139,8 +139,7 @@ public class Projection2 extends RelationalAlgebra2{
 			return null;
 		}
 		int ts = colNamesChild.size();
-		Tuple X;
-		X = t;
+		
 		List<String> sl = new ArrayList<String>();
 		List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 		for(int j=0;j<ts;j++)

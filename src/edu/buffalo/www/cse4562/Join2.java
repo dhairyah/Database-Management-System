@@ -148,12 +148,12 @@ public class Join2 extends RelationalAlgebra2{
 					hashJoin = new HashMap<String, ArrayList<Tuple>>();
 					
 					
-					String leftTableName = leftExp.getTable().getName();
+					//String leftTableName = leftExp.getTable().getName();
 					String rightTableName = rightExp.getTable().getName();
 				//	String leftChildTableName = "",leftChildTableAliasName="";
-					String rightChildTableName = "",rightChildTableAliasName="";
+					//String rightChildTableName = "",rightChildTableAliasName="";
 					
-					if(this.leftChild instanceof Scan2)
+					/*if(this.leftChild instanceof Scan2)
 					{
 						Scan2 leftChild = (Scan2)(this.leftChild);
 						FromItem table = leftChild.fromitem;
@@ -187,7 +187,7 @@ public class Join2 extends RelationalAlgebra2{
 						Column colName = (Column)expression;
 						rightChildTableName = colName.getTable().getName();
 						rightChildTableAliasName = colName.getTable().getAlias();
-					}
+					}*/
 					
 					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
 					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
