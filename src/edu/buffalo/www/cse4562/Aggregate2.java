@@ -8,11 +8,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.PrimitiveValue.InvalidPrimitive;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
 
 public class Aggregate2 extends RelationalAlgebra2 {
@@ -220,23 +223,34 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		
 	}
 	
-	PrimitiveValue getSumAggr(List<Tuple> allTuples,Integer aggrIndex) throws InvalidPrimitive
+	PrimitiveValue getSumAggr(List<Tuple> allTuples,Integer aggrIndex) throws SQLException
 	{
+		Eval eval = new Eval() {
+			public PrimitiveValue eval(Column arg0) throws SQLException {
+				return null;
+			}
+
+		};
+		
 		Iterator<Tuple> tupleItr = allTuples.iterator();
-		long longSum=0;
-		double doubleSum=0.0; 
+		PrimitiveValue retLong = new LongValue(0);
+		PrimitiveValue retDouble = new DoubleValue(0.0);
 		int retType=-1; // 0 for long and 1 for double
 		while(tupleItr.hasNext())
 		{
 			PrimitiveValue val = tupleItr.next().tuple.get(aggrIndex);
 			if(val instanceof LongValue)
 			{
-				longSum=longSum+val.toLong();
+				Expression add = new Addition(retLong,val);
+				retLong = eval.eval(add);
+				
 				retType=0;
 			}
 			else if(val instanceof DoubleValue)
 			{
-				doubleSum = doubleSum+val.toDouble();
+				Expression add = new Addition(retDouble,val);
+				retDouble = eval.eval(add);
+				
 				retType=1;
 			}
 			
@@ -244,13 +258,11 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		
 		if(retType==0)
 		{
-			PrimitiveValue d = new LongValue(longSum);
-			return d;
+			return retLong;
 		}
 		else
 		{
-			PrimitiveValue d = new DoubleValue(doubleSum);
-			return d;
+			return retDouble;
 		}
 		
 	}
