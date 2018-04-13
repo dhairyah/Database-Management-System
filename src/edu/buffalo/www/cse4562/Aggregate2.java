@@ -414,6 +414,41 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				init=1;
 				hashItr = hashAggr.keySet().iterator();
 				
+				if(parent instanceof OrderBy2)
+				{
+					OrderBy2 p = (OrderBy2)parent;
+					String keyVal = "";
+					long avgCnt = 0;
+					Tuple retTuple;
+					PrimitiveValue val;
+					while(hashItr.hasNext())
+					{
+						keyVal = hashItr.next();
+						avgCnt = aggrKeyCnt.get(keyVal);
+						
+						retTuple = hashAggr.get(keyVal);
+						for(int i=0;i<aggrFunctions.size();i++)
+						{
+							if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg"))
+							{
+								val = retTuple.tuple.get(functionIndex.get(i));
+								Expression divide = new Division(val,new LongValue(avgCnt));
+								retTuple.tuple.set(functionIndex.get(i), eval.eval(divide)) ;
+							}
+							
+						}
+						p.otable.add(new ArrayList<PrimitiveValue>());
+						for(int i = 0; i < retTuple.tuple.size(); i++)
+						{
+							 p.otable.get(p.tai).add(retTuple.tuple.get(i));  
+							 
+						}
+						p.tai++;
+					}
+					
+					return null;
+				}
+				
 				
 			}
 			String keyVal="";

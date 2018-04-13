@@ -53,6 +53,13 @@ public class OrderBy2 extends RelationalAlgebra2
 
 	@Override
 	Tuple retNext() throws SQLException {
+		
+		if(leftChild instanceof Aggregate2)
+		{
+			Aggregate2 aggObj = (Aggregate2)leftChild;
+			leftChild.retNext();
+			return null;
+		}
 
 	    Tuple tupleobj = leftChild.retNext();
 		if(tupleobj!=null)
