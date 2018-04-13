@@ -98,6 +98,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			if(iterate instanceof Selection2)
 			{
 				Selection2 selNode = (Selection2)iterate;
+
 				if(selNode.expression instanceof AndExpression)
 				{
 					List<Expression> expList = new ArrayList<Expression>();
@@ -114,7 +115,9 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 						
 						selOptParseTree(root, op);
 					}
-				}				
+				}
+				selNode.expression = null;
+				break;
 			}
 			iterate = iterate.leftChild;
 		}

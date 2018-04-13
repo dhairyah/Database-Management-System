@@ -62,6 +62,7 @@ public class Selection2 extends RelationalAlgebra2{
 		}
 		*/
 		tupleobj = leftChild.retNext();
+
 		Eval eval = new Eval() {
 			@Override
 			public PrimitiveValue eval(Column arg0) throws SQLException {
@@ -85,15 +86,22 @@ public class Selection2 extends RelationalAlgebra2{
 		};
 		while(tupleobj!=null)
 		{
-			//System.out.println("exp:"+expression);	  
-			PrimitiveValue type = eval.eval(expression);
-			if(type.toBool() == true)
+			if(expression!=null)
 			{
-				return tupleobj;
+				//System.out.println("exp:"+expression);	  
+				PrimitiveValue type = eval.eval(expression);
+				if(type.toBool() == true)
+				{
+					return tupleobj;
+				}
+				else
+				{
+					tupleobj = leftChild.retNext();
+				}
 			}
 			else
 			{
-				tupleobj = leftChild.retNext();
+				return tupleobj;
 			}
 		}
 		return null;
