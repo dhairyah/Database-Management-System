@@ -324,10 +324,10 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	List<Function> aggrFunctions = new ArrayList<Function>();
 	List<Integer> groupByIndex = new ArrayList<Integer>();
 	List<Integer> functionIndex = new ArrayList<Integer>(); 
-	HashMap<String,Tuple> hashAggr;
-	HashMap<String,Integer> aggrKeyCnt;
+	HashMap<ArrayList<PrimitiveValue>,Tuple> hashAggr;
+	HashMap<ArrayList<PrimitiveValue>,Integer> aggrKeyCnt;
 //	HashMap<String,  Long> hashSum=new HashMap<>();
-	Iterator<String> hashItr;
+	Iterator<ArrayList<PrimitiveValue>> hashItr;
 	String groupByColVals="";
 	Integer init=0,aggrTupleSent=0;
 	Eval eval = new Eval() {
@@ -375,37 +375,41 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			if(init==0)
 			{
 				Tuple childTuple;
-				hashAggr=new HashMap<String, Tuple>();
-				aggrKeyCnt = new HashMap<String, Integer>();
+				hashAggr=new HashMap<ArrayList<PrimitiveValue>, Tuple>();
+				ArrayList<PrimitiveValue> grpList = new ArrayList<>();
+				aggrKeyCnt = new HashMap<ArrayList<PrimitiveValue>, Integer>();
 				while((childTuple=leftChild.retNext())!=null)
 				{
+					grpList = new ArrayList<>();
 					for(int i=0;i<groupByIndex.size();i++)
 					{
-						groupByColVals = groupByColVals+childTuple.tuple.get(groupByIndex.get(i))+"||";
+						//groupByColVals = groupByColVals+childTuple.tuple.get(groupByIndex.get(i))+"||";
+						grpList.add(childTuple.tuple.get(groupByIndex.get(i)));
 					}
 					
-					if(hashAggr.containsKey(groupByColVals))
+					if(hashAggr.containsKey(grpList))
 					{
 						
-						computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
-						hashAggr.put(groupByColVals, childTuple);
-						aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
+						computeAllStreamAggr(hashAggr.get(grpList),childTuple);
+						hashAggr.put(grpList, childTuple);
+						aggrKeyCnt.put(grpList, aggrKeyCnt.get(grpList)+1);
 						
 					}
 					else	
 					{
-						hashAggr.put(groupByColVals, childTuple);
-						aggrKeyCnt.put(groupByColVals, 1);
+						hashAggr.put(grpList, childTuple);
+						aggrKeyCnt.put(grpList, 1);
 					}
 		
 					groupByColVals="";
+					
 				}
 				init=1;
 				hashItr = hashAggr.keySet().iterator();
 				
 				
 			}
-			String keyVal="";
+			ArrayList<PrimitiveValue> keyVal;
 			//List<Tuple> groupByTuples =new ArrayList<Tuple>();
 			int avgCnt=0;
 			Tuple retTuple;
