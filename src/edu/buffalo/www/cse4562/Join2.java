@@ -190,7 +190,7 @@ public class Join2 extends RelationalAlgebra2{
 					}
 					
 					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
-					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && (childTables.indexOf(rightTableName) == childTables.size() - 1))
+					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
 					{
 						key = rightExp;
 						useHashJoin = true;
