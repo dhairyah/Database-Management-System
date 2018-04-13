@@ -114,9 +114,6 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 						
 						selOptParseTree(root, op);
 					}
-					//assuming there is no join above main selection and all the selection expressions have been pushed down.
-					iterate.leftChild.parent = iterate.parent;
-					iterate.parent.leftChild = iterate.leftChild;
 				}				
 			}
 			iterate = iterate.leftChild;
