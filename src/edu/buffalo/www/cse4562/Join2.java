@@ -1,14 +1,10 @@
 /*package edu.buffalo.www.cse4562;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sf.jsqlparser.schema.Column;
-
 public class Join2 extends RelationalAlgebra2{
-
 	public Tuple current_left_tuple;
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -44,7 +40,6 @@ public class Join2 extends RelationalAlgebra2{
 				//tupleobj.colNames.addAll(current_left_tuple.colNames);
 				tupleobj.tuple.addAll(rightTuple.tuple);
 				//tupleobj.colNames.addAll(rightTuple.colNames);
-
 				return tupleobj;
 			}
 			current_left_tuple = null;
@@ -70,27 +65,20 @@ public class Join2 extends RelationalAlgebra2{
 		colNamesParent.addAll(colNamesChild);
 		return colNamesParent;
 	}
-
 	@Override
 	void close() {
 		// TODO Auto-generated method stub
 		
 	}
-
-
 	@Override
 	boolean hasNext() throws SQLException {
 		return leftChild.hasNext();
 	}
-
-
 	@Override
 	void reset() {
 		leftChild.reset();
 		
 	}
-
-
 }*/
 
 package edu.buffalo.www.cse4562;
@@ -148,12 +136,12 @@ public class Join2 extends RelationalAlgebra2{
 					hashJoin = new HashMap<String, ArrayList<Tuple>>();
 					
 					
-					//String leftTableName = leftExp.getTable().getName();
+					String leftTableName = leftExp.getTable().getName();
 					String rightTableName = rightExp.getTable().getName();
 				//	String leftChildTableName = "",leftChildTableAliasName="";
-					//String rightChildTableName = "",rightChildTableAliasName="";
+					String rightChildTableName = "",rightChildTableAliasName="";
 					
-					/*if(this.leftChild instanceof Scan2)
+					if(this.leftChild instanceof Scan2)
 					{
 						Scan2 leftChild = (Scan2)(this.leftChild);
 						FromItem table = leftChild.fromitem;
@@ -187,7 +175,7 @@ public class Join2 extends RelationalAlgebra2{
 						Column colName = (Column)expression;
 						rightChildTableName = colName.getTable().getName();
 						rightChildTableAliasName = colName.getTable().getAlias();
-					}*/
+					}
 					
 					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
 					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
