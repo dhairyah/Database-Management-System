@@ -27,7 +27,6 @@ public class Selection2 extends RelationalAlgebra2{
 		{
 			return null;
 		}
-
 		Eval eval = new Eval() {
 			@Override
 			public PrimitiveValue eval(Column arg0) throws SQLException {
@@ -47,7 +46,6 @@ public class Selection2 extends RelationalAlgebra2{
 				}
 				return tupleobj.tuple.get(index);
 			}
-
 		};
 		//System.out.println("exp:"+expression);	  
 		PrimitiveValue type = eval.eval(expression);

@@ -16,6 +16,8 @@ public abstract class RelationalAlgebra2
    public RelationalAlgebra2 rightChild;
    public List<Column> colNamesParent;
    public List<Column> colNamesChild;
+   public List<String> childTables;
+   public List<String> childTableAliases;
    
    abstract List<Column> open() throws IOException;
    abstract void close();
@@ -27,6 +29,8 @@ public abstract class RelationalAlgebra2
    {
 	   colNamesParent = new ArrayList<Column>();
 	   colNamesChild = new ArrayList<Column>();
+	   childTables = new ArrayList<String>();
+	   childTableAliases = new ArrayList<String>();
    }
    
    

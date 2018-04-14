@@ -101,7 +101,6 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				if(selNode.expression instanceof AndExpression)
 				{
 					List<Expression> expList = new ArrayList<Expression>();
-					List<RelationalAlgebra2> selObjList = new ArrayList<RelationalAlgebra2>();
 					createCondList((AndExpression)selNode.expression, expList);
 					for(int i = 0; i < expList.size(); i++)
 					{
@@ -112,7 +111,6 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 						op.parent = null;
 						op.leftChild = null;
 						op.rightChild = null;
-						selObjList.add(op);
 						
 						selOptParseTree(root, op);
 					}
@@ -182,6 +180,48 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 	}
 	
 	public static boolean traverseTreeJoin(RelationalAlgebra2 root, RelationalAlgebra2 op, RelationalAlgebra2 parent, boolean left)
+	{				
+		boolean found = false;
+		if(root == null)
+			return false;
+		
+
+		if(!found && root.leftChild != null)
+			found = traverseTreeJoin(root.leftChild,op, root, true);
+		
+		if(!found && root.rightChild != null)
+			found = traverseTreeJoin(root.rightChild,op, root, false);
+		
+		if(!found && root instanceof Join2)
+		{
+			Selection2 selObj = (Selection2)op;
+			Join2 joinObj = (Join2)root;
+			
+			Expression exp = selObj.expression;
+			Column leftExp = (Column)((BinaryExpression)exp).getLeftExpression();
+			Column rightExp = (Column)((BinaryExpression)exp).getRightExpression();
+			String leftTableName = leftExp.getTable().getName();
+			String rightTableName = rightExp.getTable().getName();
+			
+			if((joinObj.childTables.contains(leftTableName) || ((joinObj.childTableAliases != null) && (joinObj.childTableAliases.contains(leftTableName)))) &&
+				(joinObj.childTables.contains(rightTableName) || ((joinObj.childTableAliases != null) && (joinObj.childTableAliases.contains(rightTableName)))))
+			{
+				found = true;
+				op.parent = root.parent;
+				op.leftChild = root;
+				if(left)
+					parent.leftChild = op;
+				else
+					parent.rightChild = op;
+				root.parent = op;
+				return true;
+			}
+		}
+		
+		return found;
+	}
+	
+	/*public static boolean traverseTreeJoin(RelationalAlgebra2 root, RelationalAlgebra2 op, RelationalAlgebra2 parent, boolean left)
 	{				
 		boolean found = false;
 		if(root == null)
@@ -261,7 +301,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			found = traverseTreeJoin(root.rightChild,op, root, false);
 		
 		return found;
-	}
+	}*/
 	
 	
 	public static void createCondList(AndExpression exp, List<Expression> expList)
@@ -503,6 +543,13 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				op.leftChild = leftChild;
 				op.rightChild = rightChild;
 				
+				op.childTables.add(from.toString());
+				op.childTables.add(query.getJoins().get(0).getRightItem().toString());
+				
+				op.childTableAliases.add(from.getAlias());
+				op.childTableAliases.add(query.getJoins().get(0).getRightItem().getAlias());
+				
+				
 				leftChild.parent = op;
 				rightChild.parent = op;
 				
@@ -516,6 +563,15 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 					
 					opp.leftChild = op;
 					opp.rightChild = right;
+					
+					
+					opp.childTables.addAll(op.childTables);
+					opp.childTables.add(query.getJoins().get(i).getRightItem().toString());
+					
+					opp.childTableAliases.addAll(op.childTableAliases);
+					opp.childTableAliases.add(query.getJoins().get(i).getRightItem().getAlias());
+					
+					
 					right.parent = opp;					
 					op.parent = opp;
 					op = opp;
