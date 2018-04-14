@@ -330,6 +330,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	Iterator<String> hashItr;
 	String groupByColVals="";
 	Integer init=0,aggrTupleSent=0;
+	int i;
 	Eval eval = new Eval() {
 		public PrimitiveValue eval(Column arg0) throws SQLException {
 			return null;
@@ -370,7 +371,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 
 	@Override
 	Tuple  retNext() throws SQLException {
-		if(this.groupByColumns!=null)
+		if(groupByColumns!=null)
 		{
 			
 			if(init==0)
@@ -378,7 +379,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				firstTimeCall();
 			}
 			
-			String keyVal="";
+			String keyVal=null;
 			//List<Tuple> groupByTuples =new ArrayList<Tuple>();
 			int avgCnt=0;
 			Tuple retTuple;
@@ -389,7 +390,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				avgCnt = aggrKeyCnt.get(keyVal);
 				
 				retTuple = hashAggr.get(keyVal);
-				for(int i=0;i<aggrFunctions.size();i++)
+				for(i=0;i<aggrFunctions.size();i++)
 				{
 					if(aggrFunctions.get(i).getName().equals("AVG"))
 					{
@@ -579,7 +580,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		int aggrIndex=0;
 		PrimitiveValue val;
 		
-		for(int i=0;i<aggrFunctions.size();i++)
+		for(i=0;i<aggrFunctions.size();i++)
 		{
 			aggrIndex = functionIndex.get(i);
 			//if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg") || aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
@@ -602,15 +603,16 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		aggrKeyCnt = new HashMap<String, Integer>();
 		while((childTuple=leftChild.retNext())!=null)
 		{
-			for(int i=0;i<groupByIndex.size();i++)
+			for(i=0;i<groupByIndex.size();i++)
 			{
-				groupByColVals = groupByColVals+childTuple.tuple.get(groupByIndex.get(i))+"||";
+				groupByColVals = groupByColVals.concat(childTuple.tuple.get(groupByIndex.get(i)).toString());
+						
 			}
 			
 			if(hashAggr.containsKey(groupByColVals))
 			{
 				
-				this.computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
+				computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
 				hashAggr.put(groupByColVals, childTuple);
 				aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
 				
