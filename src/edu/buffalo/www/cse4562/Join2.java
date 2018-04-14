@@ -113,6 +113,9 @@ public class Join2 extends RelationalAlgebra2{
 	List<Column> leftChildCols = new ArrayList<Column>();
 	List<Column> rightChildCols = new ArrayList<Column>();
 	
+	List<Tuple> rightList = new ArrayList<Tuple>();
+	Iterator<Tuple> rightListIterator;
+	
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
 		// TODO Auto-generated method stub
@@ -226,6 +229,18 @@ public class Join2 extends RelationalAlgebra2{
 				}
 			}
 		}
+		else
+		{
+			Tuple childTuple = new Tuple();	
+			while((childTuple=rightChild.retNext())!=null)
+			{
+				retTuple = new Tuple();
+				retTuple.tuple.addAll(childTuple.tuple);
+				
+				rightList.add(retTuple);
+			}
+			
+		}
 		
 		Tuple tupleobj = new Tuple();
 		
@@ -276,14 +291,18 @@ public class Join2 extends RelationalAlgebra2{
 				if(current_left_tuple == null)
 				{
 					current_left_tuple = leftChild.retNext();
+					
+					rightListIterator = rightList.iterator();
 					if(current_left_tuple==null)
 					{
 						break;
 					}
 				}
 	 
-				while((rightTuple=rightChild.retNext())!=null)
+				//while((rightTuple=rightListIterator.next())!=null)
+				while(rightListIterator.hasNext())
 				{
+					rightTuple = rightListIterator.next();
 					tupleobj.tuple.clear();
 					tupleobj.colNames.clear();
 					tupleobj.tuple.addAll(current_left_tuple.tuple);
@@ -294,7 +313,8 @@ public class Join2 extends RelationalAlgebra2{
 					return tupleobj;
 				}
 				current_left_tuple = null;
-				rightChild.reset();
+				//rightListIterator.
+				//rightChild.reset();
 			
 			}
 		}
