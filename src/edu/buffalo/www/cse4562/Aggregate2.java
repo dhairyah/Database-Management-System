@@ -324,10 +324,12 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	List<Function> aggrFunctions = new ArrayList<Function>();
 	List<Integer> groupByIndex = new ArrayList<Integer>();
 	List<Integer> functionIndex = new ArrayList<Integer>(); 
+	List<String> keyVals = new ArrayList<String>(); 
 	HashMap<String,Tuple> hashAggr;
 	HashMap<String,Integer> aggrKeyCnt;
 //	HashMap<String,  Long> hashSum=new HashMap<>();
-	Iterator<String> hashItr;
+	//Iterator<String> hashItr;
+	Iterator<String> kiter;
 	String groupByColVals="";
 	Integer init=0,aggrTupleSent=0;
 	int i;
@@ -384,12 +386,14 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			int avgCnt=0;
 			Tuple retTuple;
 			PrimitiveValue val;
-			while(hashItr.hasNext())
+		
+			while(kiter.hasNext())
 			{
-				keyVal = hashItr.next();
+				keyVal = kiter.next();
 				avgCnt = aggrKeyCnt.get(keyVal);
 				
 				retTuple = hashAggr.get(keyVal);
+				hashAggr.remove(keyVal);
 				for(i=0;i<aggrFunctions.size();i++)
 				{
 					if(aggrFunctions.get(i).getName().equals("AVG"))
@@ -403,6 +407,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				
 				return retTuple;				
 			}
+			hashAggr=null;
 			return null;
 		}
 		else
@@ -603,11 +608,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		aggrKeyCnt = new HashMap<String, Integer>();
 		while((childTuple=leftChild.retNext())!=null)
 		{
-			for(i=0;i<groupByIndex.size();i++)
-			{
-				groupByColVals = groupByColVals.concat(childTuple.tuple.get(groupByIndex.get(i)).toString());
-						
-			}
+			groupByColVals =  computeKey(childTuple);
 			
 			if(hashAggr.containsKey(groupByColVals))
 			{
@@ -621,12 +622,25 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			{
 				hashAggr.put(groupByColVals, childTuple);
 				aggrKeyCnt.put(groupByColVals, 1);
+				keyVals.add(groupByColVals);
 			}
 
 			groupByColVals="";
 		}
 		init=1;
-		hashItr = hashAggr.keySet().iterator();
+		//hashItr = hashAggr.keySet().iterator();
+		kiter = keyVals.iterator();
+	}
+	
+	String computeKey(Tuple childTuple)
+	{
+		String groupByColVals = "";
+		for(i=0;i<groupByIndex.size();i++)
+		{
+			groupByColVals = groupByColVals.concat(childTuple.tuple.get(groupByIndex.get(i)).toString());
+					
+		}
+		return groupByColVals;
 	}
 
 }
