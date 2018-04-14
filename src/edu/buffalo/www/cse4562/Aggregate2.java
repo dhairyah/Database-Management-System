@@ -391,7 +391,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				retTuple = hashAggr.get(keyVal);
 				for(int i=0;i<aggrFunctions.size();i++)
 				{
-					if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg"))
+					if(aggrFunctions.get(i).getName().equals("AVG"))
 					{
 						val = retTuple.tuple.get(functionIndex.get(i));
 						Expression divide = new Division(val,new LongValue(avgCnt));
