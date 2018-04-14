@@ -102,6 +102,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 public class Join2 extends RelationalAlgebra2{
 
 	public Tuple current_left_tuple;
+	Tuple retTuple;
 	HashMap<String,  ArrayList<Tuple>> hashJoin;
 	Integer init = 0;
 	Iterator<Tuple> listItr = null;
@@ -117,6 +118,50 @@ public class Join2 extends RelationalAlgebra2{
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	Eval evalLeft = new Eval() {
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			int index = leftChildCols.indexOf(arg0);
+			if(index == -1)
+			{
+				int size = leftChildCols.size();
+				for(int it = 0; it < size; it++)
+				{
+					if((arg0.getTable().getName().equalsIgnoreCase(leftChildCols.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equalsIgnoreCase(leftChildCols.get(it).getColumnName())))
+					{
+						index = it;
+						break;
+					}
+				}
+			}
+			return current_left_tuple.tuple.get(index);
+		}
+
+	};
+	
+	Eval evalRight = new Eval() {
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			int index = rightChildCols.indexOf(arg0);
+			if(index == -1)
+			{
+				int size = rightChildCols.size();
+				for(int it = 0; it < size; it++)
+				{
+					if((arg0.getTable().getName().equalsIgnoreCase(rightChildCols.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equalsIgnoreCase(rightChildCols.get(it).getColumnName())))
+					{
+						index = it;
+						break;
+					}
+				}
+			}
+			return retTuple.tuple.get(index);
+		}
+
+	};
 	
 	
 	@Override
@@ -194,30 +239,10 @@ public class Join2 extends RelationalAlgebra2{
 					{
 						while((childTuple=rightChild.retNext())!=null)
 						{
-							Tuple retTuple = new Tuple();
+							retTuple = new Tuple();
 							retTuple.tuple.addAll(childTuple.tuple);
-							Eval eval = new Eval() {
-								@Override
-								public PrimitiveValue eval(Column arg0) throws SQLException {
-									int index = rightChildCols.indexOf(arg0);
-									if(index == -1)
-									{
-										int size = rightChildCols.size();
-										for(int it = 0; it < size; it++)
-										{
-											if((arg0.getTable().getName().equalsIgnoreCase(rightChildCols.get(it).getTable().getAlias())) && 
-													(arg0.getColumnName().equalsIgnoreCase(rightChildCols.get(it).getColumnName())))
-											{
-												index = it;
-												break;
-											}
-										}
-									}
-									return retTuple.tuple.get(index);
-								}
-					
-							};
-							String colValKey = eval.eval(key).toString();
+							
+							String colValKey = evalRight.eval(key).toString();
 							if(hashJoin.containsKey(colValKey))
 							{
 								hashJoin.get(colValKey).add(retTuple);
@@ -252,28 +277,8 @@ public class Join2 extends RelationalAlgebra2{
 					{
 						break;
 					}
-					Eval eval = new Eval() {
-						@Override
-						public PrimitiveValue eval(Column arg0) throws SQLException {
-							int index = leftChildCols.indexOf(arg0);
-							if(index == -1)
-							{
-								int size = leftChildCols.size();
-								for(int it = 0; it < size; it++)
-								{
-									if((arg0.getTable().getName().equalsIgnoreCase(leftChildCols.get(it).getTable().getAlias())) && 
-											(arg0.getColumnName().equalsIgnoreCase(leftChildCols.get(it).getColumnName())))
-									{
-										index = it;
-										break;
-									}
-								}
-							}
-							return current_left_tuple.tuple.get(index);
-						}
-			
-					};
-					String colValKey = eval.eval(leftKey).toString();
+					
+					String colValKey = evalLeft.eval(leftKey).toString();
 					tupleList = new ArrayList<Tuple>();
 					tupleList = hashJoin.get(colValKey);
 					if(tupleList != null)
