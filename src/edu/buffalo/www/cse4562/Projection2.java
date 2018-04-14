@@ -33,8 +33,8 @@ public class Projection2 extends RelationalAlgebra2{
 				int size = colNamesChild.size();
 				for(int it = 0; it < size; it++)
 				{
-					if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
-							(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
+					if((arg0.getTable().getName().equals(colNamesChild.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equals(colNamesChild.get(it).getColumnName())))
 					{
 						index = it;
 						break;
