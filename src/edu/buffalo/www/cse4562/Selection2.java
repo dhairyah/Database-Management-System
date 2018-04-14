@@ -27,6 +27,7 @@ public class Selection2 extends RelationalAlgebra2{
 		{
 			return null;
 		}
+
 		Eval eval = new Eval() {
 			@Override
 			public PrimitiveValue eval(Column arg0) throws SQLException {
@@ -46,6 +47,7 @@ public class Selection2 extends RelationalAlgebra2{
 				}
 				return tupleobj.tuple.get(index);
 			}
+
 		};
 		//System.out.println("exp:"+expression);	  
 		PrimitiveValue type = eval.eval(expression);
@@ -60,30 +62,29 @@ public class Selection2 extends RelationalAlgebra2{
 		}
 		*/
 		tupleobj = leftChild.retNext();
-		while(tupleobj!=null)
-		{
-
-			Eval eval = new Eval() {
-				@Override
-				public PrimitiveValue eval(Column arg0) throws SQLException {
-					int index = colNamesChild.indexOf(arg0);
-					if(index == -1)
+		Eval eval = new Eval() {
+			@Override
+			public PrimitiveValue eval(Column arg0) throws SQLException {
+				int index = colNamesChild.indexOf(arg0);
+				if(index == -1)
+				{
+					int size = colNamesChild.size();
+					for(int it = 0; it < size; it++)
 					{
-						int size = colNamesChild.size();
-						for(int it = 0; it < size; it++)
+						if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+								(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
 						{
-							if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
-									(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
-							{
-								index = it;
-								break;
-							}
+							index = it;
+							break;
 						}
 					}
-					return tupleobj.tuple.get(index);
 				}
-	
-			};
+				return tupleobj.tuple.get(index);
+			}
+
+		};
+		while(tupleobj!=null)
+		{
 			//System.out.println("exp:"+expression);	  
 			PrimitiveValue type = eval.eval(expression);
 			if(type.toBool() == true)
