@@ -186,41 +186,7 @@ public class Join2 extends RelationalAlgebra2{
 				//	String leftChildTableName = "",leftChildTableAliasName="";
 					String rightChildTableName = "",rightChildTableAliasName="";
 					
-					if(this.leftChild instanceof Scan2)
-					{
-						Scan2 leftChild = (Scan2)(this.leftChild);
-						FromItem table = leftChild.fromitem;
-				//		leftChildTableName = ((Table)table).getName();
-				//		leftChildTableAliasName = ((Table)table).getAlias();
-					}
-					else if(this.leftChild instanceof Selection2)
-					{
-						Selection2 leftChild = (Selection2)(this.leftChild);
-						Expression expression = leftChild.expression;
-						Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
-				//		leftChildTableName = colName.getTable().getName();
-				//		leftChildTableAliasName = colName.getTable().getAlias();
-					}
 					
-					if(this.rightChild instanceof Scan2)
-					{
-						Scan2 rightChild = (Scan2)(this.rightChild);
-						FromItem table = rightChild.fromitem;
-						rightChildTableName = ((Table)table).getName();
-						rightChildTableAliasName = ((Table)table).getAlias();
-					}
-					else if(this.rightChild instanceof Selection2)
-					{
-						Selection2 rightChild = (Selection2)(this.rightChild);
-						Expression expression = rightChild.expression;
-						while(expression instanceof Column == false)
-						{
-							expression = ((BinaryExpression)expression).getLeftExpression();
-						}
-						Column colName = (Column)expression;
-						rightChildTableName = colName.getTable().getName();
-						rightChildTableAliasName = colName.getTable().getAlias();
-					}
 					
 					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
 					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
@@ -269,7 +235,6 @@ public class Join2 extends RelationalAlgebra2{
 		{
 			while (true)
 			{
-				
 				if(current_left_tuple == null)
 				{
 					current_left_tuple = leftChild.retNext();
