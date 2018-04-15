@@ -20,6 +20,34 @@ public class Projection2 extends RelationalAlgebra2{
 	public List<SelectItem> projection;
 	public String subQuery_alias="";
 	private List<SelectExpressionItem> projExpression = new ArrayList<SelectExpressionItem>();
+	private Tuple t;
+	private List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
+	private int ps;
+	
+	Eval eval = new Eval() {
+
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			int index = colNamesChild.indexOf(arg0);
+			//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
+			if(index == -1)
+			{
+				int size = colNamesChild.size();
+				for(int it = 0; it < size; it++)
+				{
+					if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
+					{
+						index = it;
+						break;
+					}
+				}
+
+			}
+			return t.tuple.get(index);
+
+		}
+	};
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -31,8 +59,8 @@ public class Projection2 extends RelationalAlgebra2{
 	List<Column> open() throws IOException {
 		colNamesChild = leftChild.open();
 		colNamesParent.addAll(colNamesChild);
+		ps= projection.size();
 		List<Column> tempColumnNames = new ArrayList<Column>();
-		int ps= projection.size();	
 		for(int j=0;j<ps;j++)
 		{	
 			SelectItem i = projection.get(j);
@@ -72,7 +100,6 @@ public class Projection2 extends RelationalAlgebra2{
 					}
 					
 				}
-				int lop = 2;
 			}
 			else if(i instanceof AllColumns )
 			{
@@ -134,38 +161,14 @@ public class Projection2 extends RelationalAlgebra2{
 
 	@Override
 	Tuple retNext() throws SQLException {
-		int ps= projection.size();
-		Tuple t = leftChild.retNext();
+		t = leftChild.retNext();
 		if(t == null)
 		{
 			return null;
 		}
-		List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
+		tempTuple.clear();
 
-		Eval eval = new Eval() {
-
-			@Override
-			public PrimitiveValue eval(Column arg0) throws SQLException {
-				int index = colNamesChild.indexOf(arg0);
-				//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
-				if(index == -1)
-				{
-					int size = colNamesChild.size();
-					for(int it = 0; it < size; it++)
-					{
-						if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
-								(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
-						{
-							index = it;
-							break;
-						}
-					}
-
-				}
-				return t.tuple.get(index);
-
-			}
-		};
+		
 		for (int j = 0; j < ps; j++)
 		{
 			SelectExpressionItem k = projExpression.get(j);
