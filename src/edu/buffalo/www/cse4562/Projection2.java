@@ -19,6 +19,7 @@ public class Projection2 extends RelationalAlgebra2{
 
 	public List<SelectItem> projection;
 	public String subQuery_alias="";
+	private List<SelectExpressionItem> projExpression = new ArrayList<SelectExpressionItem>();
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -39,6 +40,7 @@ public class Projection2 extends RelationalAlgebra2{
 			{
 				// System.out.println("selexpr");
 				SelectExpressionItem k = (SelectExpressionItem)i;
+				projExpression.add(k);
 				String alias = k.getAlias();
 				Expression expr = k.getExpression();
 				// System.out.println("sel :"+expr);
@@ -138,16 +140,7 @@ public class Projection2 extends RelationalAlgebra2{
 		{
 			return null;
 		}
-		int ts = colNamesChild.size();
-		Tuple X;
-		X = t;
-		List<String> sl = new ArrayList<String>();
 		List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
-		for(int j=0;j<ts;j++)
-		{
-			String tt = colNamesChild.get(j).getColumnName();
-			sl.add(tt);
-		}
 
 		Eval eval = new Eval() {
 
@@ -175,44 +168,13 @@ public class Projection2 extends RelationalAlgebra2{
 		};
 		for (int j = 0; j < ps; j++)
 		{
-			SelectItem i = projection.get(j);
-			if(i instanceof SelectExpressionItem)
-			{
-				SelectExpressionItem k = (SelectExpressionItem)i;
+			SelectExpressionItem k = projExpression.get(j);
 
-				Expression expr = k.getExpression();
-				PrimitiveValue type = eval.eval(expr);
+			Expression expr = k.getExpression();
+			PrimitiveValue type = eval.eval(expr);
 
-				tempTuple.add(type);
-			}
-			else if(i instanceof AllColumns )
-			{
-				tempTuple.addAll(t.tuple);
-			}
-			else if (i instanceof AllTableColumns)
-			{
-				//	 System.out.println("alltabc");
-				AllTableColumns tab = (AllTableColumns) i;
-				Table tab_name = tab.getTable();
-				int numCols = colNamesChild.size();
-				for(int ind = 0; ind < numCols; ind++)
-				{
-
-					// System.out.println("inside for");
-					if(colNamesChild.get(ind).getTable().getAlias() != null)
-					{
-						// System.out.println("pehif+ pec : "+tab_name.getName()+" and tabname +"+ t.colNames.get(ind).getTable().getName()+" and ali+"+t.colNames.get(ind).getTable().getAlias());
-
-						if((colNamesChild.get(ind).getTable().getName().equalsIgnoreCase(tab_name.getName())) || (colNamesChild.get(ind).getTable().getAlias().equalsIgnoreCase(tab_name.getName())))
-						{
-							// System.out.println("beef");
-							PrimitiveValue type = eval.eval(colNamesChild.get(ind));
-							tempTuple.add(type);
-						}
-					}
-
-				}
-			}
+			tempTuple.add(type);
+			
 
 		}
 
