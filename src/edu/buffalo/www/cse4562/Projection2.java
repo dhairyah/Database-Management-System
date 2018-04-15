@@ -171,12 +171,9 @@ public class Projection2 extends RelationalAlgebra2{
 		
 		for (int j = 0; j < ps; j++)
 		{
-			SelectExpressionItem k = projExpression.get(j);
+			//PrimitiveValue type =;
 
-			Expression expr = k.getExpression();
-			PrimitiveValue type = eval.eval(expr);
-
-			tempTuple.add(type);
+			tempTuple.add(eval.eval(projExpression.get(j).getExpression()));
 			
 
 		}
