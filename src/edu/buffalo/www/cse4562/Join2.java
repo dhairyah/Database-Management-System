@@ -108,8 +108,6 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.select.FromItem;
 
 public class Join2 extends RelationalAlgebra2{
 
@@ -349,7 +347,7 @@ public class Join2 extends RelationalAlgebra2{
 				{
 					rightTuple = rightListIt.next();
 					tupleobj.tuple.clear();
-					tupleobj.colNames.clear();
+					//tupleobj.colNames.clear();
 					tupleobj.tuple.addAll(current_left_tuple.tuple);
 					//tupleobj.colNames.addAll(current_left_tuple.colNames);
 					tupleobj.tuple.addAll(rightTuple.tuple);
@@ -364,7 +362,7 @@ public class Join2 extends RelationalAlgebra2{
 			}
 		}
 			
-			
+		rightTupleList.clear();	
 		return null;
 		
 		
