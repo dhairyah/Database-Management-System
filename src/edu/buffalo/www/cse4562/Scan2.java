@@ -108,7 +108,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		if(tupplelist.hasNext())
 		{
 			CSVRecord tupple = tupplelist.next();
-			//tupleobj.record = tupple;
+			tupleobj.record = tupple;
 			tupleobj.tuple.clear();
 			
 			int numColumns = create.getColumnDefinitions().size();
@@ -165,7 +165,7 @@ public class Scan2 extends RelationalAlgebra2 {
 
 				}
 
-				//tupleobj.table = create;
+				tupleobj.table = create;
 				
 //				tupleobj.table.getTable().setAlias(fromitem.getAlias());
 
