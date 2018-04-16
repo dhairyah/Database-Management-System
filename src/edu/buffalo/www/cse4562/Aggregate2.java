@@ -339,10 +339,9 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	HashMap<String,Integer> aggrKeyCnt;
 //	HashMap<String,  Long> hashSum=new HashMap<>();
 	Iterator<String> hashItr;
-	PrimitiveValue val;
 	String groupByColVals="";
-	Integer init=0,aggrTupleSent=0,aggrIndex=0;
-	
+	Integer init=0,aggrTupleSent=0;
+
 	Eval eval = new Eval() {
 
 		@Override
@@ -400,20 +399,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					if(hashAggr.containsKey(groupByColVals))
 					{
 						
-						//computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
-						for(int i=0;i<aggrFunctions.size();i++)
-						{
-							aggrIndex = functionIndex.get(i);
-							//if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg") || aggrFunctions.get(i).getName().equalsIgnoreCase("sum"))
-							//{
-								
-								val = hashAggr.get(groupByColVals).tuple.get(aggrIndex);
-								val = eval.eval(new Addition(val,childTuple.tuple.get(aggrIndex)));
-								childTuple.tuple.set(aggrIndex, val);
-								
-							//}
-										
-						}	
+						computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
 						hashAggr.put(groupByColVals, childTuple);
 						aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
 						
@@ -447,7 +433,8 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					if(aggrFunctions.get(i).getName().equalsIgnoreCase("avg"))
 					{
 						val = retTuple.tuple.get(functionIndex.get(i));
-						retTuple.tuple.set(functionIndex.get(i), eval.eval(new Division(val,new LongValue(avgCnt)))) ;
+						Expression divide = new Division(val,new LongValue(avgCnt));
+						retTuple.tuple.set(functionIndex.get(i), eval.eval(divide)) ;
 					}
 					
 				}
@@ -626,7 +613,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 		
 	}
 	
-	/*void computeAllStreamAggr(Tuple aggrTuple, Tuple nextTuple) throws SQLException //computes sum and avg functions
+	void computeAllStreamAggr(Tuple aggrTuple, Tuple nextTuple) throws SQLException //computes sum and avg functions
 	{
 		int aggrIndex=0;
 		PrimitiveValue val;
@@ -645,6 +632,6 @@ public class Aggregate2 extends RelationalAlgebra2 {
 						
 		}		
 		
-	}*/
+	}
 
 }
