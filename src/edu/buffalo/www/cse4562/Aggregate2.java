@@ -399,7 +399,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					if(hashAggr.containsKey(groupByColVals))
 					{
 						
-						//computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
+						computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
 						hashAggr.put(groupByColVals, childTuple);
 						aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
 						
