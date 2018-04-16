@@ -16,6 +16,12 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 	int orderByIndex_1, orderByIndex_2;
 	boolean isAsc;
 
+	Eval eval = new Eval() {
+
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			return null;
+		}};
 
 	public CompareOverride(int index1, int index2, boolean isAsc) {
 		this.orderByIndex_1 = index1;
@@ -33,12 +39,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 		PrimitiveValue result_prim = null;
 		Boolean r = null;
 
-		Eval eval = new Eval() {
-
-			@Override
-			public PrimitiveValue eval(Column arg0) throws SQLException {
-				return null;
-			}};
+		
 
 			if(v1 instanceof StringValue)
 			{
