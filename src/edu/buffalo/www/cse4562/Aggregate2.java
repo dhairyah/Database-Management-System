@@ -341,12 +341,13 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	Iterator<String> hashItr;
 	String groupByColVals="";
 	Integer init=0,aggrTupleSent=0;
+
 	Eval eval = new Eval() {
+
+		@Override
 		public PrimitiveValue eval(Column arg0) throws SQLException {
 			return null;
-		}
-
-	};
+		}};
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
