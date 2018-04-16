@@ -126,6 +126,50 @@ public class Join2 extends RelationalAlgebra2{
 	
 	List<Tuple> rightTupleList = new ArrayList<Tuple>();
 	Iterator<Tuple> rightListIt;
+	Tuple retTuple;
+	Eval evalRight = new Eval() {
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			int index = rightChildCols.indexOf(arg0);
+			if(index == -1)
+			{
+				int size = rightChildCols.size();
+				for(int it = 0; it < size; it++)
+				{
+					if((arg0.getTable().getName().equalsIgnoreCase(rightChildCols.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equalsIgnoreCase(rightChildCols.get(it).getColumnName())))
+					{
+						index = it;
+						break;
+					}
+				}
+			}
+			return retTuple.tuple.get(index);
+		}
+
+	};
+	
+	Eval evalLeft = new Eval() {
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			int index = leftChildCols.indexOf(arg0);
+			if(index == -1)
+			{
+				int size = leftChildCols.size();
+				for(int it = 0; it < size; it++)
+				{
+					if((arg0.getTable().getName().equalsIgnoreCase(leftChildCols.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equalsIgnoreCase(leftChildCols.get(it).getColumnName())))
+					{
+						index = it;
+						break;
+					}
+				}
+			}
+			return current_left_tuple.tuple.get(index);
+		}
+
+	};
 	
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -156,7 +200,7 @@ public class Join2 extends RelationalAlgebra2{
 				//	String leftChildTableName = "",leftChildTableAliasName="";
 					String rightChildTableName = "",rightChildTableAliasName="";
 					
-					if(this.leftChild instanceof Scan2)
+					/*if(this.leftChild instanceof Scan2)
 					{
 						Scan2 leftChild = (Scan2)(this.leftChild);
 						FromItem table = leftChild.fromitem;
@@ -190,7 +234,7 @@ public class Join2 extends RelationalAlgebra2{
 						Column colName = (Column)expression;
 						rightChildTableName = colName.getTable().getName();
 						rightChildTableAliasName = colName.getTable().getAlias();
-					}
+					}*/
 					
 					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
 					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
@@ -209,30 +253,10 @@ public class Join2 extends RelationalAlgebra2{
 					{
 						while((childTuple=rightChild.retNext())!=null)
 						{
-							Tuple retTuple = new Tuple();
+							retTuple = new Tuple();
 							retTuple.tuple.addAll(childTuple.tuple);
-							Eval eval = new Eval() {
-								@Override
-								public PrimitiveValue eval(Column arg0) throws SQLException {
-									int index = rightChildCols.indexOf(arg0);
-									if(index == -1)
-									{
-										int size = rightChildCols.size();
-										for(int it = 0; it < size; it++)
-										{
-											if((arg0.getTable().getName().equalsIgnoreCase(rightChildCols.get(it).getTable().getAlias())) && 
-													(arg0.getColumnName().equalsIgnoreCase(rightChildCols.get(it).getColumnName())))
-											{
-												index = it;
-												break;
-											}
-										}
-									}
-									return retTuple.tuple.get(index);
-								}
-					
-							};
-							String colValKey = eval.eval(key).toString();
+							
+							String colValKey = evalRight.eval(key).toString();
 							if(hashJoin.containsKey(colValKey))
 							{
 								hashJoin.get(colValKey).add(retTuple);
@@ -267,28 +291,8 @@ public class Join2 extends RelationalAlgebra2{
 					{
 						break;
 					}
-					Eval eval = new Eval() {
-						@Override
-						public PrimitiveValue eval(Column arg0) throws SQLException {
-							int index = leftChildCols.indexOf(arg0);
-							if(index == -1)
-							{
-								int size = leftChildCols.size();
-								for(int it = 0; it < size; it++)
-								{
-									if((arg0.getTable().getName().equalsIgnoreCase(leftChildCols.get(it).getTable().getAlias())) && 
-											(arg0.getColumnName().equalsIgnoreCase(leftChildCols.get(it).getColumnName())))
-									{
-										index = it;
-										break;
-									}
-								}
-							}
-							return current_left_tuple.tuple.get(index);
-						}
-			
-					};
-					String colValKey = eval.eval(leftKey).toString();
+					
+					String colValKey = evalLeft.eval(leftKey).toString();
 					tupleList1 = new ArrayList<Tuple>();
 					tupleList1 = hashJoin.get(colValKey);
 					if(tupleList1 != null)
