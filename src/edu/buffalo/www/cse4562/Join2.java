@@ -117,12 +117,15 @@ public class Join2 extends RelationalAlgebra2{
 	HashMap<String,  ArrayList<Tuple>> hashJoin;
 	Integer init = 0;
 	Iterator<Tuple> listItr = null;
-	List<Tuple> tupleList;
+	List<Tuple> tupleList1;
 	Column key;
 	Column leftKey;
 	boolean useHashJoin = false;
 	List<Column> leftChildCols = new ArrayList<Column>();
 	List<Column> rightChildCols = new ArrayList<Column>();
+	
+	List<Tuple> rightTupleList = new ArrayList<Tuple>();
+	Iterator<Tuple> rightListIt;
 	
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -286,10 +289,10 @@ public class Join2 extends RelationalAlgebra2{
 			
 					};
 					String colValKey = eval.eval(leftKey).toString();
-					tupleList = new ArrayList<Tuple>();
-					tupleList = hashJoin.get(colValKey);
-					if(tupleList != null)
-						listItr = tupleList.iterator();
+					tupleList1 = new ArrayList<Tuple>();
+					tupleList1 = hashJoin.get(colValKey);
+					if(tupleList1 != null)
+						listItr = tupleList1.iterator();
 					
 				}
 	 
@@ -313,19 +316,34 @@ public class Join2 extends RelationalAlgebra2{
 		
 		else
 		{
+			if(init == 0)
+			{
+				Tuple rightchildTuple = new Tuple();
+				while((rightchildTuple=rightChild.retNext())!=null)
+				{
+					Tuple retTuple = new Tuple();
+					retTuple.tuple.addAll(rightchildTuple.tuple);
+					rightTupleList.add(retTuple);
+				}
+				rightListIt = rightTupleList.iterator();
+				init = 1;
+			}
 			while(true)
 			{
 				if(current_left_tuple == null)
 				{
 					current_left_tuple = leftChild.retNext();
+					
 					if(current_left_tuple==null)
 					{
 						break;
 					}
 				}
 	 
-				while((rightTuple=rightChild.retNext())!=null)
+				//while((rightTuple=rightChild.retNext())!=null)
+				while(rightListIt.hasNext())
 				{
+					rightTuple = rightListIt.next();
 					tupleobj.tuple.clear();
 					tupleobj.colNames.clear();
 					tupleobj.tuple.addAll(current_left_tuple.tuple);
@@ -336,7 +354,8 @@ public class Join2 extends RelationalAlgebra2{
 					return tupleobj;
 				}
 				current_left_tuple = null;
-				rightChild.reset();
+				rightListIt = rightTupleList.iterator();
+				
 			
 			}
 		}
