@@ -11,8 +11,8 @@ import net.sf.jsqlparser.statement.create.table.CreateTable;
 
 public class Tuple 
 {
-  public CreateTable table;
-  public CSVRecord record;
+  //public CreateTable table;
+  //public CSVRecord record;
   public List<PrimitiveValue> tuple;
   //public List<String> columnNames;
   public List<Column> colNames;

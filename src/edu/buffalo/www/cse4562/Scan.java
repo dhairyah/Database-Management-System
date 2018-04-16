@@ -92,7 +92,7 @@ public class Scan  extends Tuple implements RelationalAlgebra
 	   {
 		//Expression left = expression.
 		CSVRecord tupple = tupplelist.next();
-		tupleobj.record = tupple;
+		//tupleobj.record = tupple;
 		tupleobj.tuple.clear();
 		//tupleobj.columnNames.clear();
 		tupleobj.colNames.clear();
@@ -162,10 +162,10 @@ public class Scan  extends Tuple implements RelationalAlgebra
 				
 			}
 		
-		tupleobj.table = create;
+		//tupleobj.table = create;
 		//System.out.println("InScan_retNext:"+tupleobj.table.getColumnDefinitions());
 		//System.out.println("InSCan:"+fromitem.getAlias());
-		tupleobj.table.getTable().setAlias(fromitem.getAlias());//Changes 3/15 ////////////
+		//tupleobj.table.getTable().setAlias(fromitem.getAlias());//Changes 3/15 ////////////
 		
 		//System.out.println("In_Scann:"+tupleobj.table.getTable().getAlias());
    
