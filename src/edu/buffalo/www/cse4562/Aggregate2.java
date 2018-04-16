@@ -399,7 +399,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					if(hashAggr.containsKey(groupByColVals))
 					{
 						
-						computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
+						//computeAllStreamAggr(hashAggr.get(groupByColVals),childTuple);
 						hashAggr.put(groupByColVals, childTuple);
 						aggrKeyCnt.put(groupByColVals, aggrKeyCnt.get(groupByColVals)+1);
 						
@@ -428,7 +428,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 				avgCnt = aggrKeyCnt.get(keyVal);
 				
 				retTuple = hashAggr.get(keyVal);
-				/*for(int i=0;i<aggrFunctions.size();i++)
+				for(int i=0;i<aggrFunctions.size();i++)
 				{
 					if(aggrFunctions.get(i).getName().equals("AVG"))
 					{
@@ -437,7 +437,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 						retTuple.tuple.set(functionIndex.get(i), eval.eval(divide)) ;
 					}
 					
-				}*/
+				}
 				
 				return retTuple;				
 			}
