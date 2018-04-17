@@ -318,7 +318,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.jsqlparser.eval.Eval;
+//import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
@@ -341,13 +341,15 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	Iterator<String> hashItr;
 	String groupByColVals="";
 	Integer init=0,aggrTupleSent=0;
+	EvalClass e = new EvalClass(null,null);
 
-	Eval eval = new Eval() {
+	/*_Eval eval = new Eval() {
 
 		@Override
 		public PrimitiveValue eval(Column arg0) throws SQLException {
 			return null;
 		}};
+		*/
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -434,7 +436,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 					{
 						val = retTuple.tuple.get(functionIndex.get(i));
 						Expression divide = new Division(val,new LongValue(avgCnt));
-						retTuple.tuple.set(functionIndex.get(i), eval.eval(divide)) ;
+						retTuple.tuple.set(functionIndex.get(i), e.eval(divide)) ;
 					}
 					
 				}
@@ -536,12 +538,13 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	
 	PrimitiveValue getSumAggr(List<Tuple> allTuples,Integer aggrIndex) throws SQLException
 	{
-		Eval eval = new Eval() {
+		/*Eval eval = new Eval() {
 			public PrimitiveValue eval(Column arg0) throws SQLException {
 				return null;
 			}
 
 		};
+		*/
 		
 		Iterator<Tuple> tupleItr = allTuples.iterator();
 		PrimitiveValue retLong = new LongValue(0);
@@ -553,14 +556,14 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			if(val instanceof LongValue)
 			{
 				Expression add = new Addition(retLong,val);
-				retLong = eval.eval(add);
+				retLong = e.eval(add);
 				
 				retType=0;
 			}
 			else if(val instanceof DoubleValue)
 			{
 				Expression add = new Addition(retDouble,val);
-				retDouble = eval.eval(add);
+				retDouble = e.eval(add);
 				
 				retType=1;
 			}
@@ -625,7 +628,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			//{
 				
 				val = aggrTuple.tuple.get(aggrIndex);
-				val = eval.eval(new Addition(val,nextTuple.tuple.get(aggrIndex)));
+				val = e.eval(new Addition(val,nextTuple.tuple.get(aggrIndex)));
 				nextTuple.tuple.set(aggrIndex, val);
 				
 			//}

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jsqlparser.eval.Eval;
+//import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.schema.Column;
@@ -24,7 +24,7 @@ public class Projection2 extends RelationalAlgebra2{
 	private List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 	private int ps;
 	
-	Eval eval = new Eval() {
+	/*Eval eval = new Eval() {
 
 		@Override
 		public PrimitiveValue eval(Column arg0) throws SQLException {
@@ -47,7 +47,7 @@ public class Projection2 extends RelationalAlgebra2{
 			return t.tuple.get(index);
 
 		}
-	};
+	};*/
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -172,8 +172,8 @@ public class Projection2 extends RelationalAlgebra2{
 		for (int j = 0; j < ps; j++)
 		{
 			//PrimitiveValue type =;
-
-			tempTuple.add(eval.eval(projExpression.get(j).getExpression()));
+			EvalClass e = new EvalClass(t,colNamesChild);
+			tempTuple.add(e.eval(projExpression.get(j).getExpression()));
 			
 
 		}
