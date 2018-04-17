@@ -330,15 +330,15 @@ public class Join2 extends RelationalAlgebra2{
 				rightListIt = rightTupleList.iterator();
 				init = 1;
 			}
-			while(true)
-			{
+			//while(true)
+			//{
 				if(current_left_tuple == null)
 				{
 					current_left_tuple = leftChild.retNext();
 					
 					if(current_left_tuple==null)
 					{
-						break;
+						return null;
 					}
 				}
 	 
@@ -359,7 +359,7 @@ public class Join2 extends RelationalAlgebra2{
 				rightListIt = rightTupleList.iterator();
 				
 			
-			}
+			//}
 		}
 			
 			
