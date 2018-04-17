@@ -317,6 +317,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -335,7 +336,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 	List<Function> aggrFunctions = new ArrayList<Function>();
 	List<Integer> groupByIndex = new ArrayList<Integer>();
 	List<Integer> functionIndex = new ArrayList<Integer>(); 
-	HashMap<String,Tuple> hashAggr;
+	TreeMap<String,Tuple> hashAggr;
 	HashMap<String,Integer> aggrKeyCnt;
 //	HashMap<String,  Long> hashSum=new HashMap<>();
 	Iterator<String> hashItr;
@@ -387,7 +388,7 @@ public class Aggregate2 extends RelationalAlgebra2 {
 			if(init==0)
 			{
 				Tuple childTuple;
-				hashAggr=new HashMap<String, Tuple>();
+				hashAggr=new TreeMap<String, Tuple>();
 				aggrKeyCnt = new HashMap<String, Integer>();
 				while((childTuple=leftChild.retNext())!=null)
 				{
