@@ -327,18 +327,18 @@ public class Join2 extends RelationalAlgebra2{
 					retTuple.tuple.addAll(rightchildTuple.tuple);
 					rightTupleList.add(retTuple);
 				}
-				rightListIt = rightTupleList.iterator();
+				rightListIt = rightTupleList.listIterator();
 				init = 1;
 			}
-			//while(true)
-			//{
+			while(true)
+			{
 				if(current_left_tuple == null)
 				{
 					current_left_tuple = leftChild.retNext();
 					
 					if(current_left_tuple==null)
 					{
-						return null;
+						break;
 					}
 				}
 	 
@@ -347,7 +347,7 @@ public class Join2 extends RelationalAlgebra2{
 				{
 					rightTuple = rightListIt.next();
 					tupleobj.tuple.clear();
-					tupleobj.colNames.clear();
+					//tupleobj.colNames.clear();
 					tupleobj.tuple.addAll(current_left_tuple.tuple);
 					//tupleobj.colNames.addAll(current_left_tuple.colNames);
 					tupleobj.tuple.addAll(rightTuple.tuple);
@@ -356,10 +356,9 @@ public class Join2 extends RelationalAlgebra2{
 					return tupleobj;
 				}
 				current_left_tuple = null;
-				rightListIt = rightTupleList.iterator();
-				
+				rightListIt = rightTupleList.listIterator();
 			
-			//}
+			}
 		}
 			
 			
