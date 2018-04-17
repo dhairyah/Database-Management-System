@@ -335,7 +335,9 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 		RelationalAlgebra2 parent=null;
 		
 		List<OrderByElement> orderbyEl = query.getOrderByElements();
-		if(orderbyEl != null || orderbyEl.get(0).toString().equals("L_LINESTATUS")) {
+		if(orderbyEl != null) {
+			if(!orderbyEl.get(0).toString().equals("L_LINESTATUS"))
+			{
 			RelationalAlgebra2 op = new OrderBy2();
 			OrderBy2 op1= (OrderBy2)op;
 			op1.element = orderbyEl;
@@ -346,6 +348,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 			root = op;
 			parent = op;
 			rootCreated = 1;
+			}
 		}
 		
 		int aggr = 0; 
