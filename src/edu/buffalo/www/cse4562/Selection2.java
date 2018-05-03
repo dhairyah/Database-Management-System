@@ -12,30 +12,7 @@ import net.sf.jsqlparser.schema.Column;
 public class Selection2 extends RelationalAlgebra2{
 	
 	public Expression expression;	
-	private Tuple tupleobj;
-	private PrimitiveValue type;
-	
-	Eval eval = new Eval() {
-		@Override
-		public PrimitiveValue eval(Column arg0) throws SQLException {
-			int index = colNamesChild.indexOf(arg0);
-			if(index == -1)
-			{
-				int size = colNamesChild.size();
-				for(int it = 0; it < size; it++)
-				{
-					if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
-							(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
-					{
-						index = it;
-						break;
-					}
-				}
-			}
-			return tupleobj.tuple.get(index);
-		}
-
-	};
+	Tuple tupleobj;
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -83,11 +60,31 @@ public class Selection2 extends RelationalAlgebra2{
 		}
 		*/
 		tupleobj = leftChild.retNext();
-		
+		Eval eval = new Eval() {
+			@Override
+			public PrimitiveValue eval(Column arg0) throws SQLException {
+				int index = colNamesChild.indexOf(arg0);
+				if(index == -1)
+				{
+					int size = colNamesChild.size();
+					for(int it = 0; it < size; it++)
+					{
+						if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+								(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
+						{
+							index = it;
+							break;
+						}
+					}
+				}
+				return tupleobj.tuple.get(index);
+			}
+
+		};
 		while(tupleobj!=null)
 		{
 			//System.out.println("exp:"+expression);	  
-			type = eval.eval(expression);
+			PrimitiveValue type = eval.eval(expression);
 			if(type.toBool() == true)
 			{
 				return tupleobj;

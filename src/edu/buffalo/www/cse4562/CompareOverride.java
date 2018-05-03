@@ -4,25 +4,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-//import net.sf.jsqlparser.eval.Eval;
+import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.PrimitiveValue.InvalidPrimitive;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-//import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Column;
 
 public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 	int orderByIndex_1, orderByIndex_2;
 	boolean isAsc;
-	EvalClass e=new EvalClass(null,null);
 
-	/*Eval eval = new Eval() {
-
-		@Override
-		public PrimitiveValue eval(Column arg0) throws SQLException {
-			return null;
-		}};*/
 
 	public CompareOverride(int index1, int index2, boolean isAsc) {
 		this.orderByIndex_1 = index1;
@@ -40,7 +33,12 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 		PrimitiveValue result_prim = null;
 		Boolean r = null;
 
-		
+		Eval eval = new Eval() {
+
+			@Override
+			public PrimitiveValue eval(Column arg0) throws SQLException {
+				return null;
+			}};
 
 			if(v1 instanceof StringValue)
 			{
@@ -68,7 +66,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 					else
 					{
 						try {
-							result_prim = e.eval( new GreaterThan(v1,v2));
+							result_prim = eval.eval( new GreaterThan(v1,v2));
 						} catch (SQLException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -114,7 +112,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 			}
 
 			try {
-				result_prim = e.eval( new EqualsTo(v1,v2));
+				result_prim = eval.eval( new EqualsTo(v1,v2));
 				try {
 					r = result_prim.toBool();
 				} catch (InvalidPrimitive e) {
@@ -142,7 +140,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 					else
 					{
 						try {
-							result_prim = e.eval( new GreaterThan(v1,v2));
+							result_prim = eval.eval( new GreaterThan(v1,v2));
 						} catch (SQLException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -181,7 +179,7 @@ public class CompareOverride implements Comparator<ArrayList<PrimitiveValue>> {
 				}
 				else
 				{
-					result_prim = e.eval( new GreaterThan(v1,v2));
+					result_prim = eval.eval( new GreaterThan(v1,v2));
 				}
 			} 
 			catch (SQLException e1) {
