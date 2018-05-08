@@ -164,7 +164,7 @@ public class Join2 extends RelationalAlgebra2{
 					{
 						Selection2 leftChild = (Selection2)(this.leftChild);
 						Expression expression = leftChild.expression;
-						Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
+				//		Column colName = (Column)((BinaryExpression)expression).getLeftExpression();
 				//		leftChildTableName = colName.getTable().getName();
 				//		leftChildTableAliasName = colName.getTable().getAlias();
 					}

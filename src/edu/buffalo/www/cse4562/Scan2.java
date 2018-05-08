@@ -94,7 +94,7 @@ public class Scan2 extends RelationalAlgebra2 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		tupplelist = parser.iterator(); 
+		tupplelist = parser.iterator();
 		isOpen = false;
 	}
 

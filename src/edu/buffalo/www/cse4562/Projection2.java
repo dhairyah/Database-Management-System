@@ -1,4 +1,4 @@
-	package edu.buffalo.www.cse4562;
+package edu.buffalo.www.cse4562;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,6 +19,32 @@ public class Projection2 extends RelationalAlgebra2{
 
 	public List<SelectItem> projection;
 	public String subQuery_alias="";
+	Tuple t;
+	
+	Eval eval = new Eval() {
+
+		@Override
+		public PrimitiveValue eval(Column arg0) throws SQLException {
+			int index = colNamesChild.indexOf(arg0);
+			//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
+			if(index == -1)
+			{
+				int size = colNamesChild.size();
+				for(int it = 0; it < size; it++)
+				{
+					if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
+							(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
+					{
+						index = it;
+						break;
+					}
+				}
+
+			}
+			return t.tuple.get(index);
+
+		}
+	};
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -70,7 +96,6 @@ public class Projection2 extends RelationalAlgebra2{
 					}
 					
 				}
-				int lop = 2;
 			}
 			else if(i instanceof AllColumns )
 			{
@@ -133,14 +158,12 @@ public class Projection2 extends RelationalAlgebra2{
 	@Override
 	Tuple retNext() throws SQLException {
 		int ps= projection.size();
-		Tuple t = leftChild.retNext();
+		t = leftChild.retNext();
 		if(t == null)
 		{
 			return null;
 		}
 		int ts = colNamesChild.size();
-		Tuple X;
-		X = t;
 		List<String> sl = new ArrayList<String>();
 		List<PrimitiveValue> tempTuple = new ArrayList<PrimitiveValue>();
 		for(int j=0;j<ts;j++)
@@ -149,30 +172,7 @@ public class Projection2 extends RelationalAlgebra2{
 			sl.add(tt);
 		}
 
-		Eval eval = new Eval() {
-
-			@Override
-			public PrimitiveValue eval(Column arg0) throws SQLException {
-				int index = colNamesChild.indexOf(arg0);
-				//below code changes is add to handle alias case. In case of alias, arg0's table name has the alias. So table name needs to be compared with alias.
-				if(index == -1)
-				{
-					int size = colNamesChild.size();
-					for(int it = 0; it < size; it++)
-					{
-						if((arg0.getTable().getName().equalsIgnoreCase(colNamesChild.get(it).getTable().getAlias())) && 
-								(arg0.getColumnName().equalsIgnoreCase(colNamesChild.get(it).getColumnName())))
-						{
-							index = it;
-							break;
-						}
-					}
-
-				}
-				return t.tuple.get(index);
-
-			}
-		};
+		
 		for (int j = 0; j < ps; j++)
 		{
 			SelectItem i = projection.get(j);
