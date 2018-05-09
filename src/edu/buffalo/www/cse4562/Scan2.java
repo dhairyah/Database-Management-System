@@ -177,6 +177,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		{
 			try {
 				parser.close();
+				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
