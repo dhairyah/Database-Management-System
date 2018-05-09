@@ -83,6 +83,7 @@ public class Scan2 extends RelationalAlgebra2 {
 	public void reset()
 	{
 		try {
+			reader.close();
 			reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
