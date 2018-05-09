@@ -190,17 +190,45 @@ public class Join2 extends RelationalAlgebra2{
 					}
 					
 					//if(rightChildTableName.equals(rightTableName) || rightChildTableAliasName.equals(rightTableName))
-					if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
+					if(rightTableName != null)
 					{
-						key = rightExp;
-						useHashJoin = true;
-						leftKey = leftExp;
+						if((childTables.contains(rightTableName) || childTableAliases.contains(rightTableName)) && ((childTables.indexOf(rightTableName) == childTables.size() - 1) || (childTableAliases.indexOf(rightTableName) == childTableAliases.size() - 1)))
+						{
+							key = rightExp;
+							useHashJoin = true;
+							leftKey = leftExp;
+						}
+						else
+						{
+							key = leftExp;
+							useHashJoin = true;
+							leftKey = rightExp;
+						}
 					}
 					else
 					{
-						key = leftExp;
-						useHashJoin = true;
-						leftKey = rightExp;
+						boolean found = false;
+						for(int i = 0; i < leftChildCols.size(); i++)
+						{
+							Column temp = leftChildCols.get(i);
+							if(temp.getColumnName().equals(leftExp.getColumnName()))
+							{
+								found = true;
+								break;
+							}
+						}
+						if(found)
+						{
+							key = rightExp;
+							useHashJoin = true;
+							leftKey = leftExp;
+						}
+						else
+						{
+							key = leftExp;
+							useHashJoin = true;
+							leftKey = rightExp;
+						}
 					}
 					if(useHashJoin)
 					{
