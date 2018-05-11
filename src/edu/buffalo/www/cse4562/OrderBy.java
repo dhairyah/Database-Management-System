@@ -2,7 +2,6 @@ package edu.buffalo.www.cse4562;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.PrimitiveValue;
@@ -43,7 +42,7 @@ public class OrderBy extends Tuple implements RelationalAlgebra
          int c=0;
          //System.out.println("c:"+c);
          //System.out.println("orde:"+element.get(0));
-		 Collections.sort(otable, new CompareOverride(orderByIndex_1, orderByIndex_2, element.get(0).isAsc()));
+		 //Collections.sort(otable, new CompareOverride(orderByIndex_1, orderByIndex_2, element.get(0).isAsc()));
 		 
 		 for(int i=0;i<otable.size();i++)
 		 {
