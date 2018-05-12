@@ -537,8 +537,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 				Scan2 leftChild = new Scan2();
 				Scan2 rightChild = new Scan2();
 				
-				leftChild.fromitem = from;
-				rightChild.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
+				leftChild.fromitem = (FromItem) query.getJoins().get(0).getRightItem();
+				rightChild.fromitem = from;
 				
 				op.leftChild = leftChild;
 				op.rightChild = rightChild;
