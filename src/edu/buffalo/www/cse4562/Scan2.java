@@ -36,7 +36,7 @@ public class Scan2 extends RelationalAlgebra2 {
 	CSVParser parser=null;
 	CreateTable create=new CreateTable();
 	Tuple tupleobj = null;
-	Iterator<CSVRecord> tupplelist = null;
+	//Iterator<CSVRecord> tupplelist = null;
 	public boolean isOpen = false;
 	public Expression expression;
 	public boolean testing =false;
@@ -64,7 +64,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		create.setTableOptionsStrings(temp.getTableOptionsStrings());
 		create.getTable().setAlias(fromitem.getAlias());
 		tupleobj = new Tuple();
-		tupplelist = parser.iterator();
+		//tupplelist = parser.iterator();
         for(int i=0;i<temp.getColumnDefinitions().size();i++)
         {
         	String colName = create.getColumnDefinitions().get(i).getColumnName();
@@ -95,20 +95,20 @@ public class Scan2 extends RelationalAlgebra2 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		tupplelist = parser.iterator();
+		//tupplelist = parser.iterator();
 		isOpen = false;
 	}
 
 	boolean hasNext()
 	{
-		return tupplelist.hasNext();
+		return true;
 	}
 
 	@Override
 	Tuple retNext() throws SQLException {
-		if(tupplelist.hasNext())
+		for(CSVRecord tupple : parser)
 		{
-			CSVRecord tupple = tupplelist.next();
+			//tupple = tupplelist.next();
 			tupleobj.record = tupple;
 			tupleobj.tuple.clear();
 			
@@ -174,8 +174,7 @@ public class Scan2 extends RelationalAlgebra2 {
 			
 			return tupleobj;
 		}
-		else
-		{
+		
 			try {
 				parser.close();
 				reader.close();
@@ -183,7 +182,7 @@ public class Scan2 extends RelationalAlgebra2 {
 				e.printStackTrace();
 			}
 			return null;
-		}
+		
 
 
 	}
