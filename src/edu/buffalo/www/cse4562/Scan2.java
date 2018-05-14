@@ -31,7 +31,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 
 public class Scan2 extends RelationalAlgebra2 {
 	public FromItem fromitem;
-	Reader reader=null;
+	BufferedReader reader=null;
 	public String tablename;
 	CSVParser parser=null;
 	CreateTable create=new CreateTable();
