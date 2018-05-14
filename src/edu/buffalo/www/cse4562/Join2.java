@@ -280,7 +280,7 @@ public class Join2 extends RelationalAlgebra2{
 		
 		Tuple rightTuple = new Tuple();			
 		
-		if(useHashJoin)
+		if(1==2)
 		{
 			while (true)
 			{
