@@ -230,7 +230,7 @@ public class Join2 extends RelationalAlgebra2{
 							leftKey = rightExp;
 						}
 					}
-					if(useHashJoin)
+					if(1==2)
 					{
 						while((childTuple=rightChild.retNext())!=null)
 						{
