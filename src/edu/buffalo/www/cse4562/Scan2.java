@@ -41,6 +41,7 @@ public class Scan2 extends RelationalAlgebra2 {
 	public boolean isOpen = false;
 	public Expression expression;
 	public boolean testing =false;
+	File csvData=null;
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -52,8 +53,9 @@ public class Scan2 extends RelationalAlgebra2 {
 	{
 		List<Column> cn = this.colNamesChild;
 		tablename = ((Table) fromitem).getName();
-		reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
-		parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
+		//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+		csvData = new File("data//"+tablename+".dat")
+		parser = CSVParser.parse(csvData, CSVFormat.DEFAULT.withDelimiter('|'));
 		CreateTable temp = Main.map.get(tablename.toLowerCase());
 		
 		List<ColumnDefinition> temp_colDef = new ArrayList<ColumnDefinition>();
@@ -85,13 +87,15 @@ public class Scan2 extends RelationalAlgebra2 {
 	{
 		try {
 			reader.close();
-			reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+			//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+			csvData = new File("data//"+tablename+".dat")
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
-			parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
+			parser = CSVParser.parse(csvData, CSVFormat.DEFAULT.withDelimiter('|'));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
