@@ -56,7 +56,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		List<Column> cn = this.colNamesChild;
 		tablename = ((Table) fromitem).getName();
 		//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
-		csvData = new File("src//"+tablename+".csv");
+		csvData = new File("data//"+tablename+".dat");
 		parser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.DEFAULT.withDelimiter('|'));
 		CreateTable temp = Main.map.get(tablename.toLowerCase());
 		
@@ -95,7 +95,7 @@ public class Scan2 extends RelationalAlgebra2 {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		csvData = new File("src//"+tablename+".csv");
+		csvData = new File("data//"+tablename+".dat");
 		try {
 			parser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.DEFAULT.withDelimiter('|'));
 		} catch (IOException e) {
