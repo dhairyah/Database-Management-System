@@ -113,6 +113,8 @@ public class Scan2 extends RelationalAlgebra2 {
 
 	@Override
 	Tuple retNext() throws SQLException {
+		Runtime r = Runtime.getRuntime();
+		r.gc();
 		for(CSVRecord tupple : parser)
 		{
 			//tupple = tupplelist.next();
