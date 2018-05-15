@@ -1,8 +1,10 @@
 package edu.buffalo.www.cse4562;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -54,8 +56,8 @@ public class Scan2 extends RelationalAlgebra2 {
 		List<Column> cn = this.colNamesChild;
 		tablename = ((Table) fromitem).getName();
 		//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
-		csvData = new File("data//"+tablename+".dat")
-		parser = CSVParser.parse(csvData, CSVFormat.DEFAULT.withDelimiter('|'));
+		csvData = new File("data//"+tablename+".dat");
+		parser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.DEFAULT.withDelimiter('|'));
 		CreateTable temp = Main.map.get(tablename.toLowerCase());
 		
 		List<ColumnDefinition> temp_colDef = new ArrayList<ColumnDefinition>();
@@ -85,17 +87,11 @@ public class Scan2 extends RelationalAlgebra2 {
 
 	public void reset()
 	{
+		//reader.close();
+		//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+		csvData = new File("data//"+tablename+".dat");
 		try {
-			reader.close();
-			//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
-			csvData = new File("data//"+tablename+".dat")
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			parser = CSVParser.parse(csvData, CSVFormat.DEFAULT.withDelimiter('|'));
+			parser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.DEFAULT.withDelimiter('|'));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,6 +110,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		for(CSVRecord tupple : parser)
 		{
 			//tupple = tupplelist.next();
+			//System.out.println("hererererer");
 			tupleobj.record = tupple;
 			tupleobj.tuple.clear();
 			
@@ -182,7 +179,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		
 			try {
 				parser.close();
-				reader.close();
+				//csvData.;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
