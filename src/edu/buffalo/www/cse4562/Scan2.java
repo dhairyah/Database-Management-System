@@ -1,10 +1,7 @@
 package edu.buffalo.www.cse4562;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -34,17 +31,15 @@ import net.sf.jsqlparser.statement.select.FromItem;
 
 public class Scan2 extends RelationalAlgebra2 {
 	public FromItem fromitem;
-	BufferedReader reader=null;
+	Reader reader=null;
 	public String tablename;
 	CSVParser parser=null;
 	CreateTable create=new CreateTable();
 	Tuple tupleobj = null;
-	//Iterator<CSVRecord> tupplelist = null;
+	Iterator<CSVRecord> tupplelist = null;
 	public boolean isOpen = false;
 	public Expression expression;
 	public boolean testing =false;
-	File csvData=null;
-	Runtime r;
 
 	@Override
 	boolean api(Tuple tupleobj) throws SQLException {
@@ -56,9 +51,8 @@ public class Scan2 extends RelationalAlgebra2 {
 	{
 		List<Column> cn = this.colNamesChild;
 		tablename = ((Table) fromitem).getName();
-		//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
-		csvData = new File("data//"+tablename+".dat");
-		parser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.DEFAULT.withDelimiter('|'));
+		reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
+		parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
 		CreateTable temp = Main.map.get(tablename.toLowerCase());
 		
 		List<ColumnDefinition> temp_colDef = new ArrayList<ColumnDefinition>();
@@ -70,7 +64,7 @@ public class Scan2 extends RelationalAlgebra2 {
 		create.setTableOptionsStrings(temp.getTableOptionsStrings());
 		create.getTable().setAlias(fromitem.getAlias());
 		tupleobj = new Tuple();
-		//tupplelist = parser.iterator();
+		tupplelist = parser.iterator();
         for(int i=0;i<temp.getColumnDefinitions().size();i++)
         {
         	String colName = create.getColumnDefinitions().get(i).getColumnName();
@@ -82,45 +76,39 @@ public class Scan2 extends RelationalAlgebra2 {
 		isOpen = true;
 		colNamesParent=cn;
 		colNamesChild=cn;
-		r = Runtime.getRuntime();
 		return (cn);
 		
 	}
 
 	public void reset()
 	{
-		//reader.close();
-		//reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
 		try {
-			parser.close();
-			r.gc();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		csvData = new File("data//"+tablename+".dat");
-		try {
-			parser = CSVParser.parse(csvData, Charset.defaultCharset(), CSVFormat.DEFAULT.withDelimiter('|'));
+			reader.close();
+			reader = Files.newBufferedReader(Paths.get("data//"+tablename+".dat"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//tupplelist = parser.iterator();
+		try {
+			parser = CSVParser.parse(reader, CSVFormat.DEFAULT.withDelimiter('|'));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		tupplelist = parser.iterator();
 		isOpen = false;
 	}
 
 	boolean hasNext()
 	{
-		return true;
+		return tupplelist.hasNext();
 	}
 
 	@Override
 	Tuple retNext() throws SQLException {
-		
-		for(CSVRecord tupple : parser)
+		if(tupplelist.hasNext())
 		{
-			//tupple = tupplelist.next();
-			//System.out.println("hererererer");
+			CSVRecord tupple = tupplelist.next();
 			tupleobj.record = tupple;
 			tupleobj.tuple.clear();
 			
@@ -183,18 +171,19 @@ public class Scan2 extends RelationalAlgebra2 {
 //				tupleobj.table.getTable().setAlias(fromitem.getAlias());
 
 			}
-			//r.gc();
+			
 			return tupleobj;
 		}
-		
+		else
+		{
 			try {
 				parser.close();
-				//csvData.;
+				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return null;
-		
+		}
 
 
 	}

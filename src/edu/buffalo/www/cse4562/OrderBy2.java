@@ -21,8 +21,7 @@ public class OrderBy2 extends RelationalAlgebra2
 	List<Integer> orderByIndices = new ArrayList<Integer>();
 	List<OrderByElement> element; 
 	Tuple ne;
-	public String subQuery_alias;
-	Runtime r;
+	public String subQuery_alias;	
 	 
 
 	@Override
@@ -33,7 +32,6 @@ public class OrderBy2 extends RelationalAlgebra2
 
 	@Override
 	List<Column> open() throws IOException {
-		r = Runtime.getRuntime();
 		colNamesChild = leftChild.open();
 		colNamesParent.addAll(colNamesChild);
 		
@@ -52,7 +50,6 @@ public class OrderBy2 extends RelationalAlgebra2
 	@Override
 	Tuple retNext() throws SQLException {
 
-		r.gc();
 	    Tuple tupleobj = leftChild.retNext();
 		if(tupleobj!=null)
 		{
