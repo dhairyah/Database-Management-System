@@ -335,7 +335,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 		RelationalAlgebra2 parent=null;
 		
 		List<OrderByElement> orderbyEl = query.getOrderByElements();
-		if(orderbyEl != null) {
+		if(orderbyEl != null & query.getOrderByElements().size() !=1) {
 			RelationalAlgebra2 op = new OrderBy2();
 			OrderBy2 op1= (OrderBy2)op;
 			op1.element = orderbyEl;
