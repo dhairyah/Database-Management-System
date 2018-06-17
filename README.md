@@ -9,7 +9,7 @@ The engine comprises of a parser and a translator to build a relational algebra 
 
 <br>
 
-<b>The implementaton of the project was divided into 4 checkpoints:</b>
+<b>The implementation of the project was divided into various checkpoints whose details is given below:</b>
 <ul>
   <li><a href="https://odin.cse.buffalo.edu/teaching/cse-562/2018sp/checkpoint1.html">Checkpoint 1</a></li>
   <li><a href="https://odin.cse.buffalo.edu/teaching/cse-562/2018sp/checkpoint2.html">Checkpoint 2</a></li>
