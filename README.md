@@ -1,5 +1,5 @@
 <h2>Database-Management-System</h2>
-<hr>
+
 
 A relation query engine with an optimizer to improve performance along with correctness of results. 
 
